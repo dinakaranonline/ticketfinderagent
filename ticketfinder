@@ -1,0 +1,10 @@
+#!/bin/sh
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+export PYTHONPATH="${SCRIPT_DIR}/src:${PYTHONPATH}"
+if [ -x "/opt/homebrew/bin/python3" ]; then
+    exec /opt/homebrew/bin/python3 -m ticketfinder.cli "$@"
+elif [ -x "/usr/local/bin/python3" ]; then
+    exec /usr/local/bin/python3 -m ticketfinder.cli "$@"
+else
+    exec python3 -m ticketfinder.cli "$@"
+fi

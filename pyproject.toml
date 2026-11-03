@@ -1,0 +1,21 @@
+[build-system]
+requires = ["setuptools>=68.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ticketfinderagent"
+version = "0.1.0"
+description = "Natural-language multi-platform movie ticket watcher agent with locality radius discovery, seat occupancy tracking, and Gmail + WhatsApp diff notifications."
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = []
+
+[project.optional-dependencies]
+browser = ["playwright>=1.40.0"]
+dev = ["pytest>=8.0.0"]
+
+[project.scripts]
+ticketfinder = "ticketfinder.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
