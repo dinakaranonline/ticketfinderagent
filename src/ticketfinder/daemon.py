@@ -130,7 +130,7 @@ def run_check_for_job(
 def start_daemon_background(
     initial_delay_minutes: float = 5.0,
     interval_minutes: float = 30.0,
-    heartbeat_minutes: float = 60.0,
+    heartbeat_minutes: float = 240.0,
 ) -> tuple[bool, int, Path]:
     """
     Spawns the background watcher daemon wrapped in `/usr/bin/caffeinate -i -s` on macOS
@@ -182,14 +182,14 @@ def start_daemon_background(
 def run_daemon_worker_loop(
     initial_delay_minutes: float = 5.0,
     interval_minutes: float = 30.0,
-    heartbeat_minutes: float = 60.0,
+    heartbeat_minutes: float = 240.0,
 ) -> None:
     """
     Background loop:
       1. Waits initial_delay_minutes (default 5 mins) and sends the first consolidated status & seat notification.
       2. Loops every interval_minutes (default 30 mins):
          - Sends immediate consolidated diff alerts if any watched date opens new cinemas/showtimes.
-         - Sends an hourly Heartbeat Alert every heartbeat_minutes (default 60 mins) confirming the batch job is alive.
+         - Sends a 4-hour Heartbeat Alert every heartbeat_minutes (default 240 mins) confirming the batch job is alive.
     """
     store = Storage()
     cfg = Settings.from_env()
@@ -207,7 +207,7 @@ def run_daemon_worker_loop(
     print(
         f"[{datetime.now().isoformat()}] Started TicketFinder Daemon (PID {pid}). "
         f"First check in {initial_delay_minutes:g} mins, then every {interval_minutes:g} mins "
-        f"(hourly heartbeat every {heartbeat_minutes:g} mins)."
+        f"(4-hour heartbeat every {heartbeat_minutes:g} mins)."
     )
     sys.stdout.flush()
 
@@ -296,7 +296,7 @@ def run_daemon_worker_loop(
                 reason = (
                     "initial 5-min check"
                     if any_initial
-                    else ("new ticket openings" if any_new_openings else "1-hour heartbeat")
+                    else ("new ticket openings" if any_new_openings else "4-hour heartbeat")
                 )
                 print(
                     f"[{datetime.now().isoformat()}] Sending consolidated notification for "

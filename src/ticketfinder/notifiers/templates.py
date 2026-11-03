@@ -463,7 +463,7 @@ def render_multi_whatsapp_message(
 
     if not any_open:
         if is_heartbeat:
-            header = "💓 *HOURLY HEARTBEAT: TICKET WATCHER ACTIVE*"
+            header = "💓 *4-HOUR HEARTBEAT: TICKET WATCHER ACTIVE*"
         elif any_initial:
             header = "🤖 *TICKET WATCHER ACTIVE (5-Min Initial Check)*"
         else:
@@ -492,7 +492,7 @@ def render_multi_whatsapp_message(
             lines.extend(
                 [
                     "",
-                    "✅ *Batch Job Health:* Running in background (checks every *30 mins*, heartbeat every *1 hour*). You will get an instant alert as soon as tickets open!",
+                    "✅ *Batch Job Health:* Running in background (checks every *30 mins*, heartbeat every *4 hours*). You will get an instant alert as soon as tickets open!",
                     f"🛑 _To stop anytime: `{stop_cmd}`_",
                 ]
             )
@@ -500,7 +500,7 @@ def render_multi_whatsapp_message(
 
     # At least one date has open cinemas
     max_update = max(r.update_number for r in ordered)
-    prefix = "💓 *HOURLY HEARTBEAT + TICKET STATUS" if is_heartbeat else f"🎟️ *TICKET UPDATE #{max_update}"
+    prefix = "💓 *4-HOUR HEARTBEAT + TICKET STATUS" if is_heartbeat else f"🎟️ *TICKET UPDATE #{max_update}"
     lines = [
         f"{prefix}: {first_job.movie}*",
         f"📅 *Dates ({len(ordered)}):* {combined_dates_str}",
@@ -604,10 +604,10 @@ def render_multi_email_content(
     if not any_open:
         if is_heartbeat:
             subject = (
-                f"💓 [Hourly Heartbeat] Watcher Active for {first_job.movie} "
+                f"💓 [4-Hour Heartbeat] Watcher Active for {first_job.movie} "
                 f"({combined_dates_str}) — Checked at {checked_at}"
             )
-            title_banner = f"💓 Hourly Heartbeat — Ticket Watcher Active: {first_job.movie}"
+            title_banner = f"💓 4-Hour Heartbeat — Ticket Watcher Active: {first_job.movie}"
             header_bg = "#0f172a"
         else:
             subject = (
@@ -649,7 +649,7 @@ def render_multi_email_content(
                 f"🔗 TicketNew ({first_job.city})  : {tn_city_url}",
                 f"🔗 District Movies         : {dist_city_url}",
                 "",
-                "✅ Batch Job Status: Active on your Mac (checks every 30 minutes, heartbeat every 1 hour).",
+                "✅ Batch Job Status: Active on your Mac (checks every 30 minutes, heartbeat every 4 hours).",
                 "   You will receive an immediate alert as soon as tickets open for any watched date!",
                 "",
                 "-" * 70,
@@ -684,7 +684,7 @@ def render_multi_email_content(
               <a href="{html.escape(dist_city_url)}" style="display:inline-block; background:#4f46e5; color:#ffffff; text-decoration:none; padding:7px 12px; border-radius:6px; font-weight:600; font-size:12px;">District Movies</a>
             </div>
             <p style="background: #f0fdf4; border-left: 4px solid #22c55e; padding: 12px; border-radius: 4px;">
-              💓 <strong>Batch Job Healthy:</strong> Polling every <strong>30 minutes</strong> with an hourly heartbeat. As soon as bookings open on any watched date, you'll receive the full cinema &amp; seat availability table immediately.
+              💓 <strong>Batch Job Healthy:</strong> Polling every <strong>30 minutes</strong> with a 4-hour heartbeat. As soon as bookings open on any watched date, you'll receive the full cinema &amp; seat availability table immediately.
             </p>
             <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 20px 0;" />
             <p style="font-size: 12px; color: #6b7280;">🛑 To stop anytime, run: <code>{html.escape(stop_cmd)}</code></p>

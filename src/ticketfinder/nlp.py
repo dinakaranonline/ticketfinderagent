@@ -296,7 +296,34 @@ def parse_natural_language_query(
             radius_km = float(m_rad.group(1))
             working = working[: m_rad.start()] + " __SPLIT__ " + working[m_rad.end() :]
 
-    # 2. Extract target date(s) (handles "on 7th nov or 9th nov")
+    # 2. Extract target date(s) (handles "on 7th nov or 9th nov", "7th and 9th november", etc.)
+    month_names_rx = "|".join(MONTH_MAP.keys())
+    # Expand "7th and 9th november" -> "7th november and 9th november"
+    def _expand_dm_multi(m: re.Match) -> str:
+        d1, sep, d2, mo = m.group(1), m.group(2), m.group(3), m.group(4)
+        yr = f" {m.group(5)}" if m.group(5) else ""
+        return f"{d1} {mo}{yr} {sep} {d2} {mo}{yr}"
+
+    working = re.sub(
+        rf"\b(\d{{1,2}}(?:st|nd|rd|th)?)\s*(and|or|0r|&)\s*(\d{{1,2}}(?:st|nd|rd|th)?)\s+(?:of\s+)?({month_names_rx})\.?(?:,?\s*(20\d{{2}}))?\b",
+        _expand_dm_multi,
+        working,
+        flags=re.IGNORECASE,
+    )
+
+    # Expand "november 7th and 9th" -> "november 7th and november 9th"
+    def _expand_md_multi(m: re.Match) -> str:
+        mo, d1, sep, d2 = m.group(1), m.group(2), m.group(3), m.group(4)
+        yr = f" {m.group(5)}" if m.group(5) else ""
+        return f"{mo} {d1}{yr} {sep} {mo} {d2}{yr}"
+
+    working = re.sub(
+        rf"\b({month_names_rx})\.?\s+(\d{{1,2}}(?:st|nd|rd|th)?)\s*(and|or|0r|&)\s*(\d{{1,2}}(?:st|nd|rd|th)?)(?:,?\s*(20\d{{2}}))?\b",
+        _expand_md_multi,
+        working,
+        flags=re.IGNORECASE,
+    )
+
     extracted_dates: list[str] = []
     for _ in range(4):
         d_iso, d_span = parse_date_from_text(working, ref_date=today)
@@ -313,6 +340,7 @@ def parse_natural_language_query(
             count=1,
             flags=re.IGNORECASE,
         )
+    extracted_dates.sort()
     iso_date = extracted_dates[0]
 
     # 3. Extract city

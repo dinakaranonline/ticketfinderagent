@@ -143,17 +143,17 @@ class TestCheckersAndTemplates(unittest.TestCase):
         wa_hb = render_multi_whatsapp_message(
             [rep1, rep2], is_daemon_running=True, is_heartbeat=True
         )
-        self.assertIn("HOURLY HEARTBEAT", wa_hb)
+        self.assertIn("4-HOUR HEARTBEAT", wa_hb)
         self.assertIn("Sat, 07 Nov 2026 & Mon, 09 Nov 2026", wa_hb)
 
         subj, txt, htm = render_multi_email_content(
             [rep1, rep2], is_daemon_running=True, is_heartbeat=True
         )
-        self.assertIn("[Hourly Heartbeat]", subj)
+        self.assertIn("[4-Hour Heartbeat]", subj)
         self.assertIn("Sat, 07 Nov 2026 & Mon, 09 Nov 2026", subj)
         self.assertIn("2026-11-07", txt)
         self.assertIn("2026-11-09", txt)
-        self.assertIn("Hourly Heartbeat", htm)
+        self.assertIn("4-Hour Heartbeat", htm)
 
 
 if __name__ == "__main__":

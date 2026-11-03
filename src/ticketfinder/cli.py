@@ -469,13 +469,13 @@ def handle_natural_language_flow(
         started, pid, log_path = start_daemon_background(
             initial_delay_minutes=initial_delay_mins,
             interval_minutes=interval_mins,
-            heartbeat_minutes=60.0,
+            heartbeat_minutes=240.0,
         )
         print(
             f"\n✅ Saved Watch Job(s) {saved_ids} and started background watcher (PID {pid}).\n"
             f"   • First consolidated notification in : {initial_delay_mins:g} minutes\n"
             f"   • Subsequent checks run every        : {interval_mins:g} minutes\n"
-            f"   • Batch job heartbeat alert          : Every 60 minutes (1 hour)\n"
+            f"   • Batch job heartbeat alert          : Every 240 minutes (4 hours)\n"
             f"   • Log file: {log_path}\n"
             f"   • To stop anytime: ticketfinder stop"
         )
@@ -563,7 +563,7 @@ def cmd_tips() -> None:
     • Check after 1-minute delay (to test Locked Screen delivery):
       ./ticketfinder watch movie tickets for ramayana tamil version on 5th november near perumbakkam. restrict only the following cinemas : inox , pvr, cinepolis, miraj --now --initial-delay 1
 
-2️⃣  START BACKGROUND WATCHER (5-Min Initial + 30-Min Diffs + 1-Hr Heartbeat)
+2️⃣  START BACKGROUND WATCHER (5-Min Initial + 30-Min Diffs + 4-Hr Heartbeat)
     • Single date:
       ./ticketfinder watch movie tickets for ramayana tamil version on 7th november near perumbakkam. restrict only the following cinemas : inox , pvr, cinepolis, miraj --daemon --yes
 
@@ -728,7 +728,7 @@ def main(argv: Optional[list[str]] = None) -> int:
             parser = argparse.ArgumentParser()
             parser.add_argument("--initial-delay", type=float, default=5.0)
             parser.add_argument("--interval", type=float, default=30.0)
-            parser.add_argument("--heartbeat", type=float, default=60.0)
+            parser.add_argument("--heartbeat", type=float, default=240.0)
             p_args = parser.parse_args(rest)
             run_daemon_worker_loop(
                 initial_delay_minutes=p_args.initial_delay,
