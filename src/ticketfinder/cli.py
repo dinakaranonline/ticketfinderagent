@@ -125,6 +125,8 @@ def run_simulated_diff_test(
 
     print("\n🧪 Running 2-Step Notification & Diff Simulation (No Cron / No Background Job)...")
 
+    slot_date = "2026-11-21" if target_date.upper() == "ANY" else target_date
+
     # Wave 1: 2 initial cinemas open at 2:00 PM
     wave1_venues = [
         CinemaVenue(
@@ -134,9 +136,11 @@ def run_simulated_diff_test(
             distance_km=5.1,
             matched_by="nearby_locality",
             first_seen_at="2:00 PM",
+            show_date=slot_date,
             showtimes=[
                 ShowtimeSlot(
                     time="11:00 AM",
+                    date=slot_date,
                     screen_format="Dolby 7.1",
                     status="AVAILABLE",
                     available_seats=115,
@@ -152,9 +156,11 @@ def run_simulated_diff_test(
             distance_km=11.4,
             matched_by="nearby_locality",
             first_seen_at="2:00 PM",
+            show_date=slot_date,
             showtimes=[
                 ShowtimeSlot(
                     time="10:30 AM",
+                    date=slot_date,
                     screen_format="Dolby Atmos",
                     status="AVAILABLE",
                     available_seats=160,
@@ -163,6 +169,7 @@ def run_simulated_diff_test(
                 ),
                 ShowtimeSlot(
                     time="02:30 PM",
+                    date=slot_date,
                     screen_format="Dolby Atmos",
                     status="ALMOST_FULL",
                     available_seats=25,
@@ -201,9 +208,11 @@ def run_simulated_diff_test(
             ],
             distance_km=2.1,
             matched_by="nearby_locality",
+            show_date=slot_date,
             showtimes=[
                 ShowtimeSlot(
                     time="10:15 AM",
+                    date=slot_date,
                     screen_format="Dolby Atmos",
                     status="AVAILABLE",
                     available_seats=184,
@@ -212,6 +221,7 @@ def run_simulated_diff_test(
                 ),
                 ShowtimeSlot(
                     time="01:45 PM",
+                    date=slot_date,
                     screen_format="Dolby Atmos",
                     status="FAST_FILLING",
                     available_seats=52,
@@ -220,6 +230,7 @@ def run_simulated_diff_test(
                 ),
                 ShowtimeSlot(
                     time="06:30 PM",
+                    date=slot_date,
                     screen_format="IMAX 2D",
                     status="ALMOST_FULL",
                     available_seats=18,
@@ -228,6 +239,7 @@ def run_simulated_diff_test(
                 ),
                 ShowtimeSlot(
                     time="10:15 PM",
+                    date=slot_date,
                     screen_format="Dolby Atmos",
                     status="AVAILABLE",
                     available_seats=210,
@@ -242,15 +254,18 @@ def run_simulated_diff_test(
             booking_url="https://in.bookmyshow.com/explore/movies-chennai",
             distance_km=9.8,
             matched_by="both",
+            show_date=slot_date,
             showtimes=[
                 ShowtimeSlot(
                     time="09:00 AM",
+                    date=slot_date,
                     screen_format="Dolby Atmos",
                     status="AVAILABLE",
                     category_info="Prime: ₹190 Available, Elite: Available",
                 ),
                 ShowtimeSlot(
                     time="07:45 PM",
+                    date=slot_date,
                     screen_format="Dolby Atmos",
                     status="FAST_FILLING",
                     category_info="Prime: Fast Filling, Elite: Sold Out",
@@ -264,9 +279,11 @@ def run_simulated_diff_test(
             distance_km=5.1,
             matched_by="nearby_locality",
             first_seen_at="2:00 PM",
+            show_date=slot_date,
             showtimes=[
                 ShowtimeSlot(
                     time="11:00 AM",
+                    date=slot_date,
                     screen_format="Dolby 7.1",
                     status="FAST_FILLING",
                     available_seats=42,
@@ -275,6 +292,7 @@ def run_simulated_diff_test(
                 ),
                 ShowtimeSlot(
                     time="07:00 PM",
+                    date=slot_date,
                     screen_format="Dolby 7.1",
                     status="AVAILABLE",
                     available_seats=160,
@@ -283,6 +301,7 @@ def run_simulated_diff_test(
                 ),
                 ShowtimeSlot(
                     time="10:30 PM",
+                    date=slot_date,
                     screen_format="Dolby 7.1",
                     status="AVAILABLE",
                     available_seats=175,
@@ -298,9 +317,11 @@ def run_simulated_diff_test(
             distance_km=11.4,
             matched_by="nearby_locality",
             first_seen_at="2:00 PM",
+            show_date=slot_date,
             showtimes=[
                 ShowtimeSlot(
                     time="10:30 AM",
+                    date=slot_date,
                     screen_format="Dolby Atmos",
                     status="AVAILABLE",
                     available_seats=120,
@@ -309,6 +330,7 @@ def run_simulated_diff_test(
                 ),
                 ShowtimeSlot(
                     time="02:30 PM",
+                    date=slot_date,
                     screen_format="Dolby Atmos",
                     status="SOLD_OUT",
                     available_seats=0,
