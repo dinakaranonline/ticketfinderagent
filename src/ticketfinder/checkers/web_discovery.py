@@ -24,7 +24,8 @@ class WebDiscoveryChecker(PlatformChecker):
         if not search_html:
             return []
 
-        date_compact = job.target_date.replace("-", "")
+        is_any = job.target_date.upper() == "ANY"
+        date_compact = "" if is_any else job.target_date.replace("-", "")
         venues: list[CinemaVenue] = []
 
         # Look for BookMyShow buytickets URLs in search results
@@ -33,7 +34,9 @@ class WebDiscoveryChecker(PlatformChecker):
             search_html,
         )
         if m_bms:
-            target_bms_url = f"{m_bms.group(1)}{date_compact}"
+            target_bms_url = (
+                f"{m_bms.group(1)}{date_compact}" if date_compact else m_bms.group(1).rstrip("/")
+            )
             bms_html = fetch_page_content(target_bms_url, timeout=10.0, use_browser_fallback=False)
             venues.extend(parse_bms_html(bms_html, job.target_date, target_bms_url))
 
@@ -43,7 +46,9 @@ class WebDiscoveryChecker(PlatformChecker):
             search_html,
         )
         if m_dist:
-            target_dist_url = f"{m_dist.group(1)}?fromdate={job.target_date}"
+            target_dist_url = (
+                m_dist.group(1) if is_any else f"{m_dist.group(1)}?fromdate={job.target_date}"
+            )
             dist_html = fetch_page_content(target_dist_url, timeout=10.0, use_browser_fallback=False)
             venues.extend(parse_district_html(dist_html, job.target_date, target_dist_url))
 

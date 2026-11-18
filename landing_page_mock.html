@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CineRadar — Never Miss Prime Cinema Seats Again</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    body { font-family: 'Plus Jakarta Sans', sans-serif; }
+    .glow-purple { box-shadow: 0 0 50px -10px rgba(147, 51, 234, 0.35); }
+    .glow-gold { box-shadow: 0 0 35px -5px rgba(245, 158, 11, 0.3); }
+  </style>
+</head>
+<body class="bg-slate-950 text-slate-100 antialiased selection:bg-purple-600 selection:text-white">
+
+  <!-- Navbar -->
+  <header class="border-b border-slate-800/80 bg-slate-950/80 backdrop-blur sticky top-0 z-50">
+    <div class="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
+      <div class="flex items-center gap-2">
+        <span class="text-2xl">📡</span>
+        <span class="text-xl font-extrabold tracking-tight bg-gradient-to-r from-purple-400 via-pink-400 to-amber-300 bg-clip-text text-transparent">CineRadar</span>
+        <span class="text-xs font-semibold px-2 py-0.5 rounded-full bg-purple-950/80 text-purple-300 border border-purple-800/50 ml-1">BETA</span>
+      </div>
+      <div class="flex items-center gap-4">
+        <a href="#how-it-works" class="text-sm text-slate-400 hover:text-slate-200 transition hidden sm:inline-block">How It Works</a>
+        <a href="#pricing" class="text-sm text-slate-400 hover:text-slate-200 transition hidden sm:inline-block">Pricing</a>
+        <a href="https://t.me/movieticketfinderbot" target="_blank" class="text-xs sm:text-sm font-semibold bg-purple-600 hover:bg-purple-500 text-white px-4 py-2 rounded-xl transition shadow-lg shadow-purple-600/30 flex items-center gap-1.5">
+          <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.894 8.221l-1.97 9.28c-.145.658-.537.818-1.084.508l-3-2.21-1.446 1.394c-.16.16-.295.295-.605.295l.213-3.053 5.56-5.023c.242-.213-.054-.333-.373-.121l-6.871 4.326-2.962-.924c-.643-.204-.657-.643.136-.953l11.57-4.458c.538-.196 1.006.128.832.943z"/></svg>
+          Open Bot
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <section class="relative pt-12 pb-20 overflow-hidden">
+    <!-- Glow Gradients -->
+    <div class="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[350px] bg-purple-600/15 blur-[120px] pointer-events-none rounded-full"></div>
+    <div class="absolute top-1/3 left-1/3 w-[300px] h-[250px] bg-pink-600/10 blur-[100px] pointer-events-none rounded-full"></div>
+
+    <div class="max-w-4xl mx-auto px-4 text-center relative z-10">
+      <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-slate-900 border border-slate-700/80 text-xs font-medium text-slate-300 mb-6">
+        <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+        Tracking Chennai & Bangalore Multiplexes Live
+      </div>
+
+      <h1 class="text-4xl sm:text-6xl font-extrabold tracking-tight leading-[1.15] mb-6">
+        Never Miss Prime Cinema Seats <br class="hidden sm:block" />
+        <span class="bg-gradient-to-r from-purple-400 via-pink-300 to-amber-300 bg-clip-text text-transparent">To Unannounced Ticket Drops.</span>
+      </h1>
+
+      <p class="text-base sm:text-lg text-slate-400 max-w-2xl mx-auto mb-8 leading-relaxed">
+        Stop refreshing BookMyShow 50 times a day. <strong class="text-slate-200">CineRadar</strong> monitors District, TicketNew & BookMyShow every 30 seconds and alerts your Telegram the exact second center seats open.
+      </p>
+
+      <div class="flex flex-col sm:flex-row items-center justify-center gap-4 max-w-md mx-auto mb-10">
+        <a href="https://t.me/movieticketfinderbot" target="_blank" class="w-full sm:w-auto px-7 py-3.5 rounded-xl font-bold bg-gradient-to-r from-purple-600 via-pink-600 to-purple-600 hover:opacity-95 text-white transition shadow-xl shadow-purple-600/30 flex items-center justify-center gap-2 text-base">
+          <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24"><path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.894 8.221l-1.97 9.28c-.145.658-.537.818-1.084.508l-3-2.21-1.446 1.394c-.16.16-.295.295-.605.295l.213-3.053 5.56-5.023c.242-.213-.054-.333-.373-.121l-6.871 4.326-2.962-.924c-.643-.204-.657-.643.136-.953l11.57-4.458c.538-.196 1.006.128.832.943z"/></svg>
+          Start Radar on Telegram — Free
+        </a>
+        <a href="#demo" class="w-full sm:w-auto px-6 py-3.5 rounded-xl font-semibold bg-slate-900 hover:bg-slate-800 text-slate-300 border border-slate-700/80 transition text-base">
+          Try Interactive Demo
+        </a>
+      </div>
+
+      <div class="flex flex-wrap items-center justify-center gap-6 sm:gap-10 text-xs font-semibold text-slate-400">
+        <div class="flex items-center gap-1.5">
+          <span class="text-emerald-400 font-bold">⚡ 15-Sec</span> Drop Alert
+        </div>
+        <div class="flex items-center gap-1.5">
+          <span class="text-purple-400 font-bold">🎟️ Cross-Platform</span> (District + BMS + TN)
+        </div>
+        <div class="flex items-center gap-1.5">
+          <span class="text-amber-400 font-bold">🎯 Sweet-Spot</span> Center Rows Filter
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Interactive Demo Mock -->
+  <section id="demo" class="py-12 border-y border-slate-800/80 bg-slate-900/40">
+    <div class="max-w-4xl mx-auto px-4">
+      <div class="text-center mb-8">
+        <h2 class="text-xs uppercase font-bold tracking-wider text-purple-400 mb-2">Interactive Preview</h2>
+        <p class="text-2xl font-bold text-slate-100">See How CineRadar Works In Action</p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
+        
+        <!-- Left: Quick Query Setup -->
+        <div class="bg-slate-950 border border-slate-800 rounded-2xl p-6 shadow-xl">
+          <h3 class="text-sm font-bold text-slate-300 mb-4 flex items-center gap-2">
+            <span>⚙️</span> Configure Your Watch Request
+          </h3>
+
+          <div class="space-y-4 text-xs font-medium text-slate-400">
+            <div>
+              <label class="block mb-1 text-slate-300">Target Movie & Language</label>
+              <select id="sel-movie" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-slate-200 focus:outline-none focus:border-purple-500">
+                <option value="Ramayana (Tamil)">Ramayana (Tamil Version)</option>
+                <option value="Coolie (Tamil)">Coolie (Tamil)</option>
+                <option value="Scene (Tamil)">Scene (Tamil Version)</option>
+                <option value="Dragon (Tamil)">Dragon (Tamil)</option>
+              </select>
+            </div>
+
+            <div class="grid grid-cols-2 gap-3">
+              <div>
+                <label class="block mb-1 text-slate-300">Target Date(s)</label>
+                <select id="sel-date" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-slate-200 focus:outline-none focus:border-purple-500">
+                  <option value="Sat, 07 Nov & Mon, 09 Nov">Sat, 07 Nov & Mon, 09 Nov</option>
+                  <option value="Fri, 06 Nov">Fri, 06 Nov (Opening Day)</option>
+                  <option value="Sun, 08 Nov">Sun, 08 Nov</option>
+                </select>
+              </div>
+              <div>
+                <label class="block mb-1 text-slate-300">Locality & Radius</label>
+                <select id="sel-area" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-slate-200 focus:outline-none focus:border-purple-500">
+                  <option value="Perumbakkam (12 km)">Perumbakkam / OMR (12 km)</option>
+                  <option value="Velachery (10 km)">Velachery (10 km)</option>
+                  <option value="Anna Nagar (10 km)">Anna Nagar (10 km)</option>
+                  <option value="Vadapalani (8 km)">Vadapalani (8 km)</option>
+                </select>
+              </div>
+            </div>
+
+            <div>
+              <label class="block mb-1 text-slate-300">Screen & Multiplex Preferences</label>
+              <div class="grid grid-cols-2 gap-2 text-[11px]">
+                <label class="flex items-center gap-1.5 p-2 bg-slate-900 rounded border border-slate-800 cursor-pointer">
+                  <input type="checkbox" checked class="accent-purple-500" /> Big Screens (IMAX/BIGPIX)
+                </label>
+                <label class="flex items-center gap-1.5 p-2 bg-slate-900 rounded border border-slate-800 cursor-pointer">
+                  <input type="checkbox" checked class="accent-purple-500" /> INOX / PVR Only
+                </label>
+                <label class="flex items-center gap-1.5 p-2 bg-slate-900 rounded border border-slate-800 cursor-pointer">
+                  <input type="checkbox" checked class="accent-purple-500" /> Center Rows Only
+                </label>
+                <label class="flex items-center gap-1.5 p-2 bg-slate-900 rounded border border-slate-800 cursor-pointer">
+                  <input type="checkbox" checked class="accent-purple-500" /> 3+ Contiguous Seats
+                </label>
+              </div>
+            </div>
+
+            <button onclick="triggerSim()" class="w-full py-2.5 rounded-lg bg-purple-600 hover:bg-purple-500 text-white font-bold transition flex items-center justify-center gap-1.5 mt-2">
+              <span>⚡</span> Simulate Live Drop Alert
+            </button>
+          </div>
+        </div>
+
+        <!-- Right: Simulated Telegram Phone Alert -->
+        <div class="bg-slate-950 border border-slate-800 rounded-2xl p-5 shadow-2xl relative">
+          <div class="flex items-center justify-between border-b border-slate-800 pb-3 mb-3">
+            <div class="flex items-center gap-2">
+              <div class="w-7 h-7 rounded-full bg-purple-600 flex items-center justify-center text-xs font-bold text-white">CR</div>
+              <div>
+                <div class="text-xs font-bold text-slate-200">CineRadar Bot</div>
+                <div class="text-[10px] text-emerald-400">bot • active</div>
+              </div>
+            </div>
+            <span class="text-[10px] text-slate-500">Just Now</span>
+          </div>
+
+          <!-- Telegram Bubble -->
+          <div class="bg-slate-900/90 border border-purple-900/40 rounded-xl p-3.5 text-xs text-slate-300 space-y-2 leading-relaxed">
+            <div class="font-bold text-purple-400 flex items-center gap-1">
+              <span>🚨</span> TICKETS JUST OPENED! (25s ago)
+            </div>
+            <div id="sim-movie" class="font-semibold text-slate-100">🎬 Ramayana (Tamil Version)</div>
+            <div id="sim-date" class="text-[11px] text-slate-400">📅 Sat, 07 Nov & Mon, 09 Nov • Perumbakkam (12 km)</div>
+
+            <div class="p-2.5 rounded-lg bg-slate-950 border border-slate-800 text-[11px] space-y-1">
+              <div class="font-bold text-amber-300">🏆 INOX Marina Mall OMR — BIGPIX 3D (510 Seats)</div>
+              <div class="text-slate-400">🕒 6:15 PM • <span class="text-emerald-400 font-semibold">370/510 seats open</span></div>
+              <div class="text-slate-400">🎯 Prime Center Zone: <span class="text-slate-200 font-semibold">Row M: 12, 13, 14, 15 Available</span></div>
+            </div>
+
+            <div class="pt-1">
+              <a href="#" class="block text-center py-2 px-3 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-[11px] transition">
+                👉 Open Live Seat Layout & Book
+              </a>
+            </div>
+          </div>
+
+          <div class="text-center mt-3 text-[11px] text-slate-500">
+            Delivered straight to your Telegram in &lt; 30 seconds of cinema release.
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- 3 Killer Problems Solved -->
+  <section id="how-it-works" class="py-20">
+    <div class="max-w-5xl mx-auto px-4">
+      <div class="text-center mb-14">
+        <h2 class="text-xs uppercase font-bold tracking-wider text-purple-400 mb-2">Why CineRadar</h2>
+        <p class="text-3xl font-extrabold text-slate-100">Why Standard "Notify Me" Buttons Fail You</p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        
+        <div class="p-6 rounded-2xl bg-slate-900/60 border border-slate-800 hover:border-slate-700 transition">
+          <div class="text-3xl mb-4">⏱️</div>
+          <h3 class="text-lg font-bold text-slate-100 mb-2">Cross-Platform Advantage</h3>
+          <p class="text-sm text-slate-400 leading-relaxed">
+            Multiplexes often drop tickets on <strong>TicketNew</strong> or <strong>Paytm District</strong> 2–3 hours before BookMyShow. CineRadar scans all platforms simultaneously.
+          </p>
+        </div>
+
+        <div class="p-6 rounded-2xl bg-slate-900/60 border border-slate-800 hover:border-slate-700 transition">
+          <div class="text-3xl mb-4">🎯</div>
+          <h3 class="text-lg font-bold text-slate-100 mb-2">No Front-Row False Alarms</h3>
+          <p class="text-sm text-slate-400 leading-relaxed">
+            Other alerts ping you when only neck-strain Rows A & B are left. CineRadar analyzes the 2D seat grid and alerts you only when prime center rows are open.
+          </p>
+        </div>
+
+        <div class="p-6 rounded-2xl bg-slate-900/60 border border-slate-800 hover:border-slate-700 transition">
+          <div class="text-3xl mb-4">🚀</div>
+          <h3 class="text-lg font-bold text-slate-100 mb-2">1-Click Direct Seat Map</h3>
+          <p class="text-sm text-slate-400 leading-relaxed">
+            No searching, browsing, or date-clicking. The Telegram alert gives you a direct link straight into the exact showtime seat selection screen.
+          </p>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- Pricing -->
+  <section id="pricing" class="py-16 border-t border-slate-800/80 bg-slate-900/30">
+    <div class="max-w-4xl mx-auto px-4 text-center">
+      <h2 class="text-xs uppercase font-bold tracking-wider text-purple-400 mb-2">Transparent Pricing</h2>
+      <p class="text-3xl font-extrabold text-slate-100 mb-10">Pay Per Blockbuster Drop, Not Bloated Subscriptions</p>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-2xl mx-auto text-left">
+        
+        <div class="p-6 rounded-2xl bg-slate-950 border border-slate-800">
+          <div class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Starter</div>
+          <div class="text-3xl font-extrabold text-slate-100 mb-1">Free</div>
+          <p class="text-xs text-slate-400 mb-6">Perfect for trying out the drop radar.</p>
+          <ul class="text-xs text-slate-300 space-y-3 mb-6">
+            <li class="flex items-center gap-2"><span>✅</span> 1 Active Movie Watch</li>
+            <li class="flex items-center gap-2"><span>✅</span> 15-Minute Polling Interval</li>
+            <li class="flex items-center gap-2"><span>✅</span> Telegram & Gmail Delivery</li>
+          </ul>
+          <a href="https://t.me/movieticketfinderbot" target="_blank" class="block text-center py-2.5 rounded-xl font-bold bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs transition">
+            Start Free
+          </a>
+        </div>
+
+        <div class="p-6 rounded-2xl bg-gradient-to-b from-purple-950/40 to-slate-950 border border-purple-500/50 glow-purple relative">
+          <span class="absolute -top-3 right-5 text-[10px] font-extrabold uppercase px-2.5 py-0.5 rounded-full bg-purple-600 text-white">POPULAR</span>
+          <div class="text-xs font-bold text-purple-400 uppercase tracking-wider mb-2">Blockbuster Drop Pass</div>
+          <div class="text-3xl font-extrabold text-slate-100 mb-1">₹39 <span class="text-xs font-normal text-slate-400">/ movie</span></div>
+          <p class="text-xs text-slate-400 mb-6">For big festival & star releases.</p>
+          <ul class="text-xs text-slate-300 space-y-3 mb-6">
+            <li class="flex items-center gap-2"><span>⚡</span> <strong>Sub-30-Second Polling</strong> (Instant Drop)</li>
+            <li class="flex items-center gap-2"><span>🎯</span> <strong>Sweet-Spot Center Rows Only</strong> Filter</li>
+            <li class="flex items-center gap-2"><span>🏆</span> <strong>Big-Screen Priority</strong> (IMAX / BIGPIX)</li>
+            <li class="flex items-center gap-2"><span>🔗</span> Direct 1-Click Seat Map Deep Link</li>
+          </ul>
+          <a href="https://t.me/movieticketfinderbot" target="_blank" class="block text-center py-2.5 rounded-xl font-bold bg-purple-600 hover:bg-purple-500 text-white text-xs transition shadow-lg shadow-purple-600/30">
+            Activate for Your Next Movie
+          </a>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA Banner -->
+  <section class="py-16 border-t border-slate-800/80">
+    <div class="max-w-3xl mx-auto px-4 text-center">
+      <h2 class="text-3xl font-extrabold text-slate-100 mb-4">Ready To Beat The Housefull Board?</h2>
+      <p class="text-slate-400 text-sm mb-8">Set your movie, date, and preferred multiplex in 10 seconds on Telegram.</p>
+      <a href="https://t.me/movieticketfinderbot" target="_blank" class="inline-flex items-center gap-2 px-8 py-3.5 rounded-xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 text-white hover:opacity-95 text-base shadow-xl shadow-purple-600/30 transition">
+        <span>📲</span> Open CineRadar on Telegram
+      </a>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="border-t border-slate-900 py-8 text-center text-xs text-slate-600">
+    <p>© 2026 CineRadar. Unofficial drop monitor for Chennai & Bangalore multiplexes.</p>
+  </footer>
+
+  <script>
+    function triggerSim() {
+      const movie = document.getElementById('sel-movie').value;
+      const date = document.getElementById('sel-date').value;
+      const area = document.getElementById('sel-area').value;
+      document.getElementById('sim-movie').innerText = '🎬 ' + movie;
+      document.getElementById('sim-date').innerText = '📅 ' + date + ' • ' + area;
+    }
+  </script>
+</body>
+</html>

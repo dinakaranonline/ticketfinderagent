@@ -37,6 +37,9 @@ def merge_venues_across_platforms(venues: list[CinemaVenue]) -> list[CinemaVenue
     """Merges the same cinema discovered across multiple platforms into a unified CinemaVenue."""
     by_key: dict[str, CinemaVenue] = {}
 
+    def _slot_key(s: ShowtimeSlot) -> str:
+        return f"{s.date or ''}_{s.time.strip().upper()}"
+
     for v in venues:
         key = v.normalized_key
         if not key:
@@ -54,6 +57,7 @@ def merge_venues_across_platforms(venues: list[CinemaVenue]) -> list[CinemaVenue
                 matched_by=v.matched_by,
                 first_seen_at=v.first_seen_at,
                 extra_platforms=list(v.extra_platforms),
+                show_date=v.show_date,
             )
         else:
             existing = by_key[key]
@@ -64,16 +68,20 @@ def merge_venues_across_platforms(venues: list[CinemaVenue]) -> list[CinemaVenue
                 existing.longitude = v.longitude
             if existing.address is None and v.address is not None:
                 existing.address = v.address
+            if existing.show_date is None and v.show_date is not None:
+                existing.show_date = v.show_date
 
-            # Merge showtimes by time string, preferring the slot with exact seat counts
-            slots_by_time: dict[str, ShowtimeSlot] = {s.time.upper(): s for s in existing.showtimes}
+            # Merge showtimes by (date, time) key, preferring the slot with exact seat counts
+            slots_by_key: dict[str, ShowtimeSlot] = {_slot_key(s): s for s in existing.showtimes}
             for s in v.showtimes:
-                t_key = s.time.upper()
-                if t_key not in slots_by_time:
-                    slots_by_time[t_key] = s
+                s_key = _slot_key(s)
+                if s_key not in slots_by_key:
+                    slots_by_key[s_key] = s
                     existing.showtimes.append(s)
                 else:
-                    curr = slots_by_time[t_key]
+                    curr = slots_by_key[s_key]
+                    if not curr.date and s.date:
+                        curr.date = s.date
                     if curr.available_seats is None and s.available_seats is not None:
                         curr.available_seats = s.available_seats
                         curr.booked_seats = s.booked_seats

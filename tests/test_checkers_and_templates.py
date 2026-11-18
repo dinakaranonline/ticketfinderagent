@@ -155,6 +155,134 @@ class TestCheckersAndTemplates(unittest.TestCase):
         self.assertIn("2026-11-09", txt)
         self.assertIn("4-Hour Heartbeat", htm)
 
+    def test_any_available_date_alert_displays_actual_date(self) -> None:
+        """Verifies that an ANY date query displays the actual discovered calendar date in alerts."""
+        from ticketfinder.models import CinemaVenue, ShowtimeSlot
+
+        job = WatchJob(
+            id=52,
+            movie="Avengers Doomsday",
+            target_date="ANY",
+            city="Chennai",
+            area="Perumbakkam",
+            radius_km=15.0,
+            cinemas=["INOX", "PVR", "Cinepolis", "Miraj"],
+        )
+
+        slots = [
+            ShowtimeSlot(
+                time="10:00 AM",
+                date="2026-11-21",
+                screen_format="IMAX 3D",
+                status="AVAILABLE",
+                available_seats=150,
+                booked_seats=50,
+                total_seats=200,
+            ),
+            ShowtimeSlot(
+                time="02:30 PM",
+                date="2026-11-21",
+                screen_format="IMAX 3D",
+                status="FAST_FILLING",
+                available_seats=40,
+                booked_seats=160,
+                total_seats=200,
+            ),
+        ]
+        venue = CinemaVenue(
+            name="INOX The Marina Mall, OMR",
+            platform="District (Paytm)",
+            booking_url="https://www.district.in/movies/avengers",
+            showtimes=slots,
+            distance_km=6.2,
+            show_date="2026-11-21",
+        )
+
+        report = compute_diff_report(job, [venue], {})
+        self.assertEqual(report.discovered_dates, ["2026-11-21"])
+
+        # 1. Telegram / WhatsApp Alert
+        wa_text = render_whatsapp_message(report)
+        self.assertIn("Sat, 21 Nov 2026", wa_text)
+        self.assertIn("Date: *Sat, 21 Nov 2026*", wa_text)
+        self.assertNotIn("Avengers Doomsday — Any Available Date*", wa_text)
+
+        # 2. Email Alert
+        subj, txt, htm = render_email_content(report)
+        self.assertIn("Sat, 21 Nov 2026", subj)
+        self.assertIn("Sat, 21 Nov 2026", txt)
+        self.assertIn("Date", txt)  # Date column in ASCII table
+        self.assertIn("Sat, 21 Nov 2026", htm)
+        self.assertIn("IMAX 3D", txt)
+
+    def test_bms_and_district_any_date_parsing(self) -> None:
+        """Verifies BookMyShow and District checkers extract dates when target_date is ANY."""
+        # 1. BookMyShow
+        bms_mock = {
+            "showtimesByEvent": {
+                "currentDateCode": "20261121",
+                "venues": [
+                    {
+                        "VenueName": "PVR: Grand Mall, Velachery",
+                        "showtimes": [
+                            {
+                                "ShowTime": "07:00 PM",
+                                "ShowDateCode": "20261121",
+                                "Dimension": "2D",
+                                "AvailabilityStatus": "1",
+                            }
+                        ],
+                    }
+                ],
+            }
+        }
+        bms_html = f"<html><script>window.__INITIAL_STATE__ = {json.dumps(bms_mock)};</script></html>"
+        bms_venues = parse_bms_html(bms_html, "ANY", "https://in.bookmyshow.com/buytickets/test")
+        self.assertEqual(len(bms_venues), 1)
+        self.assertEqual(bms_venues[0].showtimes[0].date, "2026-11-21")
+        self.assertEqual(bms_venues[0].dates, ["2026-11-21"])
+
+        # 2. District SSR movieSessions
+        dist_mock = {
+            "props": {
+                "pageProps": {
+                    "data": {
+                        "serverState": {
+                            "movieSessions": {
+                                "bundle_1": {
+                                    "searchDate": "2026-11-22",
+                                    "pageData": {
+                                        "nearbyCinemas": [
+                                            {
+                                                "cinemaInfo": {
+                                                    "name": "Cinepolis: BBD Mall",
+                                                    "latitude": "12.9",
+                                                    "longitude": "80.2",
+                                                },
+                                                "sessions": [
+                                                    {
+                                                        "showTime": "2026-11-22T04:30:00Z",
+                                                        "scrnFmt": "2D",
+                                                        "avail": "100",
+                                                        "total": "200",
+                                                    }
+                                                ],
+                                            }
+                                        ]
+                                    },
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        dist_html = f'<html><script id="__NEXT_DATA__" type="application/json">{json.dumps(dist_mock)}</script></html>'
+        dist_venues = parse_district_html(dist_html, "ANY", "https://www.district.in/movies/test")
+        self.assertEqual(len(dist_venues), 1)
+        self.assertEqual(dist_venues[0].showtimes[0].date, "2026-11-22")
+        self.assertEqual(dist_venues[0].dates, ["2026-11-22"])
+
 
 if __name__ == "__main__":
     unittest.main()

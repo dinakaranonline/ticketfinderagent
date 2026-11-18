@@ -8,6 +8,7 @@ from ticketfinder.models import DiffReport
 from ticketfinder.notifiers.gmail import send_gmail_notification
 from ticketfinder.notifiers.telegram import send_telegram_notification
 from ticketfinder.notifiers.templates import (
+    _effective_date_label,
     render_email_content,
     render_multi_email_content,
     render_multi_whatsapp_message,
@@ -24,7 +25,7 @@ def send_macos_desktop_banner(
     if not r_list:
         return
     job = r_list[0].job
-    dates_str = ", ".join(r.job.target_date for r in r_list)
+    dates_str = ", ".join(_effective_date_label(r) for r in r_list)
     any_open = any(r.any_tickets_open for r in r_list)
     if any_open:
         title = f"🎟️ Tickets Open: {job.movie}"

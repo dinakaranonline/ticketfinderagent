@@ -107,6 +107,7 @@ def parse_district_next_data(
                     if not is_any_date and ist_date and ist_date != target_date and search_date != target_date:
                         continue
 
+                    slot_date = ist_date or search_date or (target_date if not is_any_date else None)
                     scrn_fmt = str(s_obj.get("scrnFmt") or "2D").strip()
                     audi = str(s_obj.get("premiumLabel") or s_obj.get("audi") or "").strip()
                     fmt_display = f"{scrn_fmt} • {audi}" if audi and audi not in scrn_fmt else scrn_fmt
@@ -142,6 +143,7 @@ def parse_district_next_data(
                     slots.append(
                         ShowtimeSlot(
                             time=time_label,
+                            date=slot_date,
                             screen_format=fmt_display,
                             status=status,
                             available_seats=avail_seats,
@@ -151,6 +153,9 @@ def parse_district_next_data(
                     )
 
                 if slots:
+                    venue_date = (slots[0].date if slots and slots[0].date else search_date) or (
+                        target_date if not is_any_date else None
+                    )
                     venues.append(
                         CinemaVenue(
                             name=c_name,
@@ -160,6 +165,7 @@ def parse_district_next_data(
                             address=address,
                             latitude=lat,
                             longitude=lon,
+                            show_date=venue_date,
                         )
                     )
 
@@ -209,10 +215,11 @@ def parse_district_next_data(
         for s_obj in sessions:
             if not isinstance(s_obj, dict):
                 continue
-            s_date = str(s_obj.get("showDate") or s_obj.get("date") or "")[:10]
+            s_date = str(s_obj.get("showDate") or s_obj.get("date") or active_date or "")[:10]
             if not is_any_date and s_date and s_date != target_date:
                 continue
 
+            slot_date = s_date or (target_date if not is_any_date else None)
             time_str = (
                 s_obj.get("showTime")
                 or s_obj.get("time")
@@ -248,6 +255,7 @@ def parse_district_next_data(
             slots.append(
                 ShowtimeSlot(
                     time=time_str,
+                    date=slot_date,
                     screen_format=str(fmt),
                     status=status,
                     available_seats=avail,
@@ -257,6 +265,9 @@ def parse_district_next_data(
             )
 
         if slots:
+            venue_date = (slots[0].date if slots and slots[0].date else active_date) or (
+                target_date if not is_any_date else None
+            )
             venues.append(
                 CinemaVenue(
                     name=c_name,
@@ -266,6 +277,7 @@ def parse_district_next_data(
                     address=address,
                     latitude=lat,
                     longitude=lon,
+                    show_date=venue_date,
                 )
             )
 

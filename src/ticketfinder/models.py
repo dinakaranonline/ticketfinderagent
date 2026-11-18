@@ -9,6 +9,7 @@ class ShowtimeSlot:
     """Represents a single showtime and its seat/ticket availability."""
 
     time: str
+    date: Optional[str] = None  # YYYY-MM-DD
     screen_format: str = "2D"
     status: str = "AVAILABLE"  # AVAILABLE, FAST_FILLING, ALMOST_FULL, SOLD_OUT
     available_seats: Optional[int] = None
@@ -108,6 +109,7 @@ class ShowtimeSlot:
     def from_dict(cls, data: dict[str, Any]) -> ShowtimeSlot:
         return cls(
             time=data.get("time", ""),
+            date=data.get("date"),
             screen_format=data.get("screen_format", "2D"),
             status=data.get("status", "AVAILABLE"),
             available_seats=data.get("available_seats"),
@@ -133,6 +135,32 @@ class CinemaVenue:
     matched_by: str = "requested_cinema"  # requested_cinema, nearby_locality, both
     first_seen_at: Optional[str] = None
     extra_platforms: list[tuple[str, str]] = field(default_factory=list)  # (platform, url)
+    show_date: Optional[str] = None  # YYYY-MM-DD when known
+
+    @property
+    def dates(self) -> list[str]:
+        """Returns sorted unique ISO dates (YYYY-MM-DD) discovered on this venue."""
+        seen: set[str] = set()
+        res: list[str] = []
+        for s in self.showtimes:
+            if s.date and s.date not in seen:
+                seen.add(s.date)
+                res.append(s.date)
+        if not res and self.show_date:
+            res.append(self.show_date)
+        return sorted(res)
+
+    def friendly_dates_label(self) -> str:
+        """Formatted human dates, e.g. 'Sat, 21 Nov 2026'."""
+        from datetime import datetime
+
+        labels: list[str] = []
+        for d in self.dates:
+            try:
+                labels.append(datetime.strptime(d, "%Y-%m-%d").strftime("%a, %d %b %Y"))
+            except Exception:
+                labels.append(d)
+        return ", ".join(labels)
 
     @property
     def normalized_key(self) -> str:
@@ -173,6 +201,7 @@ class CinemaVenue:
             "matched_by": self.matched_by,
             "first_seen_at": self.first_seen_at,
             "extra_platforms": self.extra_platforms,
+            "show_date": self.show_date,
         }
 
     @classmethod
@@ -189,6 +218,7 @@ class CinemaVenue:
             matched_by=data.get("matched_by", "requested_cinema"),
             first_seen_at=data.get("first_seen_at"),
             extra_platforms=[tuple(x) for x in data.get("extra_platforms", [])],
+            show_date=data.get("show_date"),
         )
 
 
@@ -259,3 +289,20 @@ class DiffReport:
             or self.new_showtimes_cinemas
             or self.previously_opened_cinemas
         )
+
+    @property
+    def discovered_dates(self) -> list[str]:
+        """Returns sorted unique ISO dates (YYYY-MM-DD) discovered across all open venues."""
+        seen: set[str] = set()
+        res: list[str] = []
+        all_venues = (
+            self.newly_opened_cinemas
+            + [u.venue for u in self.new_showtimes_cinemas]
+            + [u.venue for u in self.previously_opened_cinemas]
+        )
+        for v in all_venues:
+            for d in v.dates:
+                if d and d not in seen:
+                    seen.add(d)
+                    res.append(d)
+        return sorted(res)

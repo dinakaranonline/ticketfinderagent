@@ -40,17 +40,19 @@ def parse_ticketnew_html(html: str, target_date: str, booking_url: str) -> list[
         html,
         flags=re.DOTALL,
     )
+    slot_date = None if target_date.upper() == "ANY" else target_date
     for c_name, show_block in blocks:
         times = re.findall(r"\b(\d{1,2}:\d{2}\s*(?:AM|PM))\b", show_block, flags=re.IGNORECASE)
         if not times:
             continue
-        slots = [ShowtimeSlot(time=t.upper()) for t in dict.fromkeys(times)]
+        slots = [ShowtimeSlot(time=t.upper(), date=slot_date) for t in dict.fromkeys(times)]
         venues.append(
             CinemaVenue(
                 name=c_name.strip(),
                 platform="TicketNew",
                 booking_url=booking_url,
                 showtimes=slots,
+                show_date=slot_date,
             )
         )
     return venues

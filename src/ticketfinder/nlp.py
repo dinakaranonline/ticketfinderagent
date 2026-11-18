@@ -463,8 +463,9 @@ def parse_natural_language_query(
 
     if not movie_candidate:
         movie_candidate = "Unknown Movie"
-    elif movie_candidate.islower():
-        movie_candidate = movie_candidate.title()
+    else:
+        words = movie_candidate.split()
+        movie_candidate = " ".join(w if (w.isupper() and len(w) >= 2) else w.title() for w in words)
 
     return ParsedNLCommand(
         intent="WATCH",

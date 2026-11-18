@@ -51,9 +51,15 @@ def parse_bms_initial_state(
     # and reject any date earlier than target_date_compact.
     is_any_date = target_date_compact.upper() == "ANY"
     showtimes_by_event = state_data.get("showtimesByEvent") or {}
-    current_date = showtimes_by_event.get("currentDateCode")
+    current_date = str(showtimes_by_event.get("currentDateCode") or "")
     if not is_any_date and current_date and str(current_date) != target_date_compact:
         return []
+
+    cur_iso_date = (
+        f"{current_date[:4]}-{current_date[4:6]}-{current_date[6:8]}"
+        if len(current_date) == 8 and current_date.isdigit()
+        else None
+    )
 
     venue_list = (
         showtimes_by_event.get("venues")
@@ -99,9 +105,18 @@ def parse_bms_initial_state(
         for s_obj in raw_shows:
             if not isinstance(s_obj, dict):
                 continue
-            show_date = str(s_obj.get("ShowDateCode") or s_obj.get("showDateCode") or "")
-            if show_date and show_date != target_date_compact:
+            show_date = str(s_obj.get("ShowDateCode") or s_obj.get("showDateCode") or current_date or "")
+            if not is_any_date and show_date and show_date != target_date_compact:
                 continue
+
+            if len(show_date) == 8 and show_date.isdigit():
+                slot_date = f"{show_date[:4]}-{show_date[4:6]}-{show_date[6:8]}"
+            else:
+                slot_date = cur_iso_date or (
+                    f"{target_date_compact[:4]}-{target_date_compact[4:6]}-{target_date_compact[6:8]}"
+                    if len(target_date_compact) == 8 and target_date_compact.isdigit()
+                    else None
+                )
 
             time_str = (
                 s_obj.get("ShowTime")
@@ -172,6 +187,7 @@ def parse_bms_initial_state(
             slots.append(
                 ShowtimeSlot(
                     time=time_str,
+                    date=slot_date,
                     screen_format=str(fmt),
                     status=status,
                     available_seats=avail_seats,
@@ -181,6 +197,11 @@ def parse_bms_initial_state(
             )
 
         if slots:
+            venue_date = (slots[0].date if slots and slots[0].date else cur_iso_date) or (
+                f"{target_date_compact[:4]}-{target_date_compact[4:6]}-{target_date_compact[6:8]}"
+                if len(target_date_compact) == 8 and target_date_compact.isdigit()
+                else None
+            )
             venues.append(
                 CinemaVenue(
                     name=v_name,
@@ -190,6 +211,7 @@ def parse_bms_initial_state(
                     address=address,
                     latitude=lat,
                     longitude=lon,
+                    show_date=venue_date,
                 )
             )
 
@@ -223,7 +245,8 @@ def parse_bms_html(
             pass
 
     # 2. Validate that target_compact date appears as an active date link/pill in the HTML
-    if target_compact not in html and target_date not in html:
+    is_any = target_date.upper() == "ANY"
+    if not is_any and target_compact not in html and target_date not in html:
         return []
 
     # 3. DOM pattern fallback for venue blocks & showtime pills
@@ -233,13 +256,14 @@ def parse_bms_html(
         html,
         flags=re.DOTALL,
     )
+    fallback_date = None if is_any else target_date
     for v_name, lat_s, lon_s, block in venue_blocks:
         times = re.findall(r"\b(\d{1,2}:\d{2}\s*(?:AM|PM))\b", block, flags=re.IGNORECASE)
         if not times:
             continue
         lat = float(lat_s) if lat_s else None
         lon = float(lon_s) if lon_s else None
-        slots = [ShowtimeSlot(time=t.upper()) for t in dict.fromkeys(times)]
+        slots = [ShowtimeSlot(time=t.upper(), date=fallback_date) for t in dict.fromkeys(times)]
         venues.append(
             CinemaVenue(
                 name=v_name.strip(),
@@ -248,6 +272,7 @@ def parse_bms_html(
                 showtimes=slots,
                 latitude=lat,
                 longitude=lon,
+                show_date=fallback_date,
             )
         )
 
@@ -260,7 +285,8 @@ class BookMyShowChecker(PlatformChecker):
     def check(self, job: WatchJob) -> list[CinemaVenue]:
         city_slug = BMS_CITY_SLUGS.get(job.city.lower(), job.city.lower().replace(" ", "-"))
         movie_slug = re.sub(r"[^a-z0-9]+", "-", job.movie.lower()).strip("-")
-        date_compact = job.target_date.replace("-", "")
+        is_any = job.target_date.upper() == "ANY"
+        date_compact = "" if is_any else job.target_date.replace("-", "")
 
         # Discover BMS event code via search or direct movie page
         search_url = (
@@ -276,10 +302,16 @@ class BookMyShowChecker(PlatformChecker):
         )
         if m_event:
             event_code = m_event.group(1)
-            buytickets_url = (
-                f"https://in.bookmyshow.com/buytickets/{movie_slug}-{city_slug}/"
-                f"movie-{city_slug[:4]}-{event_code}-MT/{date_compact}"
-            )
+            if is_any:
+                buytickets_url = (
+                    f"https://in.bookmyshow.com/buytickets/{movie_slug}-{city_slug}/"
+                    f"movie-{city_slug[:4]}-{event_code}-MT"
+                )
+            else:
+                buytickets_url = (
+                    f"https://in.bookmyshow.com/buytickets/{movie_slug}-{city_slug}/"
+                    f"movie-{city_slug[:4]}-{event_code}-MT/{date_compact}"
+                )
             st_html = fetch_page_content(buytickets_url, timeout=12.0, use_browser_fallback=True)
             return parse_bms_html(st_html, job.target_date, buytickets_url)
 

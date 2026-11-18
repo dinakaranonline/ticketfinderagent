@@ -33,6 +33,9 @@ def compute_diff_report(
 
     seen_keys: set[str] = set()
 
+    def _slot_key(s: ShowtimeSlot) -> str:
+        return f"{s.date or ''}_{s.time.strip().upper()}"
+
     for venue in current_venues:
         key = venue.normalized_key
         seen_keys.add(key)
@@ -43,16 +46,18 @@ def compute_diff_report(
         else:
             prev_venue = previous_snapshots[key]
             venue.first_seen_at = prev_venue.first_seen_at or now_time
-            prev_slots_map: dict[str, ShowtimeSlot] = {
-                s.time.strip().upper(): s for s in prev_venue.showtimes
-            }
+            prev_slots_map: dict[str, ShowtimeSlot] = {}
+            for s in prev_venue.showtimes:
+                prev_slots_map[_slot_key(s)] = s
+                prev_slots_map[s.time.strip().upper()] = s
 
             added_slots: list[ShowtimeSlot] = []
             continuing_slots: list[ShowtimeSlot] = []
 
             for slot in venue.showtimes:
-                t_key = slot.time.strip().upper()
-                if t_key not in prev_slots_map:
+                t_key = _slot_key(slot)
+                alt_key = slot.time.strip().upper()
+                if t_key not in prev_slots_map and alt_key not in prev_slots_map:
                     added_slots.append(slot)
                 else:
                     continuing_slots.append(slot)
@@ -79,6 +84,7 @@ def compute_diff_report(
                 matched_by=venue.matched_by,
                 first_seen_at=venue.first_seen_at,
                 extra_platforms=venue.extra_platforms,
+                show_date=venue.show_date or prev_venue.show_date,
             )
             previously_opened_list.append(
                 ExistingCinemaUpdate(
@@ -91,7 +97,10 @@ def compute_diff_report(
     # Also include any previously opened cinema that might not have appeared in a partial transient scrape
     for key, prev_venue in previous_snapshots.items():
         if key not in seen_keys:
-            prev_slots_map = {s.time.strip().upper(): s for s in prev_venue.showtimes}
+            prev_slots_map = {}
+            for s in prev_venue.showtimes:
+                prev_slots_map[_slot_key(s)] = s
+                prev_slots_map[s.time.strip().upper()] = s
             previously_opened_list.append(
                 ExistingCinemaUpdate(
                     venue=prev_venue,
