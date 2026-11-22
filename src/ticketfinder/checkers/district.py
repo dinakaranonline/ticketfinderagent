@@ -38,6 +38,18 @@ def _utc_iso_to_ist_label(iso_str: str) -> tuple[str, str]:
         return iso_str[:10], iso_str
 
 
+def _booking_closed(s_obj: dict[str, Any]) -> bool:
+    """True if the session's booking closeTime (UTC) has already passed."""
+    close_raw = str(s_obj.get("closeTime") or "")
+    if "T" not in close_raw:
+        return False
+    try:
+        close_utc = datetime.strptime(close_raw[:16], "%Y-%m-%dT%H:%M")
+        return datetime.utcnow() >= close_utc
+    except ValueError:
+        return False
+
+
 def parse_district_next_data(
     next_data: dict[str, Any],
     target_date: str,
@@ -127,6 +139,27 @@ def parse_district_next_data(
                         s_obj.get("statusColor") or "",
                     )
 
+                    # Bookability: District greys out / disables shows that can't be booked,
+                    # and marks closed seat categories with statusColor "D".
+                    bookable = not (
+                        s_obj.get("disableClick") is True
+                        or str(s_obj.get("seatClass") or "").lower() == "greycol"
+                        or str(s_obj.get("statusColor") or "").upper() == "D"
+                        or entry.get("cinemaDisabled") is True
+                        or _booking_closed(s_obj)
+                    )
+                    open_areas = [
+                        a for a in (s_obj.get("areas") or [])
+                        if isinstance(a, dict) and str(a.get("statusColor") or "").upper() != "D"
+                    ]
+                    if s_obj.get("areas") and avail_seats is not None:
+                        try:
+                            avail_seats = min(
+                                avail_seats, sum(int(a.get("sAvail") or 0) for a in open_areas)
+                            )
+                        except (ValueError, TypeError):
+                            pass
+
                     # Category breakdown from areas
                     cat_parts: list[str] = []
                     for area in s_obj.get("areas") or []:
@@ -149,6 +182,7 @@ def parse_district_next_data(
                             available_seats=avail_seats,
                             total_seats=total_seats,
                             category_info=", ".join(cat_parts) if cat_parts else None,
+                            bookable=bookable,
                         )
                     )
 

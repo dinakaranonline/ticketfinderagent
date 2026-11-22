@@ -4,6 +4,16 @@ from dataclasses import asdict, dataclass, field
 from typing import Any, Optional
 
 
+def min_bookable_seats() -> int:
+    """Minimum seats left for a show to count as bookable (env MIN_BOOKABLE_SEATS, default 4)."""
+    import os
+
+    try:
+        return max(1, int(os.environ.get("MIN_BOOKABLE_SEATS", "4")))
+    except ValueError:
+        return 4
+
+
 @dataclass
 class ShowtimeSlot:
     """Represents a single showtime and its seat/ticket availability."""
@@ -17,6 +27,8 @@ class ShowtimeSlot:
     total_seats: Optional[int] = None
     category_info: Optional[str] = None
     price_info: Optional[str] = None
+    # Platform-reported bookability (False = greyed out / click disabled / booking closed).
+    bookable: Optional[bool] = None
 
     def __post_init__(self) -> None:
         self.status = (self.status or "AVAILABLE").upper()
@@ -38,6 +50,21 @@ class ShowtimeSlot:
                         self.status = "ALMOST_FULL"
                     elif pct >= 55.0:
                         self.status = "FAST_FILLING"
+
+    @property
+    def is_bookable(self) -> bool:
+        """
+        True only if the platform lets you click the show AND it has at least
+        MIN_BOOKABLE_SEATS seats left. A handful of leftover seats in an otherwise
+        full hall are usually blocked/held seats that cannot actually be selected.
+        """
+        if self.bookable is False:
+            return False
+        if self.status.upper() == "SOLD_OUT":
+            return False
+        if self.available_seats is not None:
+            return self.available_seats >= min_bookable_seats()
+        return True
 
     @property
     def occupancy_pct(self) -> Optional[float]:
@@ -117,6 +144,7 @@ class ShowtimeSlot:
             total_seats=data.get("total_seats"),
             category_info=data.get("category_info"),
             price_info=data.get("price_info"),
+            bookable=data.get("bookable"),
         )
 
 
@@ -280,7 +308,24 @@ class DiffReport:
 
     @property
     def has_new_openings(self) -> bool:
-        return bool(self.newly_opened_cinemas or self.new_showtimes_cinemas)
+        """True only if a new cinema or new showtime has bookable (not sold-out) seats."""
+        for v in self.newly_opened_cinemas:
+            if any(s.is_bookable for s in v.showtimes):
+                return True
+        for u in self.new_showtimes_cinemas:
+            if any(s.is_bookable for s in u.added_showtimes):
+                return True
+        return False
+
+    @property
+    def bookable_show_count(self) -> int:
+        """Number of currently open showtimes that still have seats available."""
+        all_venues = (
+            self.newly_opened_cinemas
+            + [u.venue for u in self.new_showtimes_cinemas]
+            + [u.venue for u in self.previously_opened_cinemas]
+        )
+        return sum(1 for v in all_venues for s in v.showtimes if s.is_bookable)
 
     @property
     def any_tickets_open(self) -> bool:
@@ -306,3 +351,34 @@ class DiffReport:
                     seen.add(d)
                     res.append(d)
         return sorted(res)
+
+
+def bookable_only_report(report: DiffReport) -> DiffReport:
+    """
+    Returns a copy of the report that keeps only showtimes you can actually book,
+    dropping cinemas left with none. Used for notifications; snapshots keep everything.
+    """
+    from dataclasses import replace
+
+    def _venue(v: CinemaVenue) -> Optional[CinemaVenue]:
+        shows = [s for s in v.showtimes if s.is_bookable]
+        return replace(v, showtimes=shows) if shows else None
+
+    newly = [nv for nv in (_venue(v) for v in report.newly_opened_cinemas) if nv]
+    new_shows: list[ExistingCinemaUpdate] = []
+    for u in report.new_showtimes_cinemas:
+        added = [s for s in u.added_showtimes if s.is_bookable]
+        nv = _venue(u.venue)
+        if added and nv:
+            new_shows.append(replace(u, venue=nv, added_showtimes=added))
+    prev: list[ExistingCinemaUpdate] = []
+    for u in report.previously_opened_cinemas:
+        nv = _venue(u.venue)
+        if nv:
+            prev.append(replace(u, venue=nv))
+    return replace(
+        report,
+        newly_opened_cinemas=newly,
+        new_showtimes_cinemas=new_shows,
+        previously_opened_cinemas=prev,
+    )

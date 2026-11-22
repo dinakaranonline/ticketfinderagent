@@ -65,7 +65,7 @@ def render_whatsapp_message(report: DiffReport, is_daemon_running: bool = False)
             f"📅 *Date:* {effective_date}",
             f"📍 *Target:* {job.target_summary}",
             "",
-            f"⏳ *Current Status:* Bookings NOT open yet for {effective_date}",
+            f"⏳ *Current Status:* No bookable seats yet for {effective_date}",
             f"🌐 *Sites Checked:* {', '.join(report.sites_checked)}",
         ]
         if is_daemon_running:
@@ -280,7 +280,7 @@ def render_email_content(
                 f"📅 Date: {date_label}   |   📍 Target: {job.target_summary}",
                 "=" * 70,
                 "",
-                f"⏳ Current Status : Bookings NOT open yet for {date_label}",
+                f"⏳ Current Status : No bookable seats yet for {date_label}",
                 f"🌐 Sites Checked  : {', '.join(report.sites_checked)}",
                 f"🕒 Checked At     : {report.checked_at}",
                 "",
@@ -615,7 +615,7 @@ def render_multi_whatsapp_message(
         ]
         for r in ordered:
             d_lbl = _effective_date_label(r)
-            lines.append(f"  • *{d_lbl}*: ⏳ Bookings NOT open yet")
+            lines.append(f"  • *{d_lbl}*: ⏳ No bookable seats yet")
 
         lines.extend(
             [
@@ -653,7 +653,7 @@ def render_multi_whatsapp_message(
             ]
         )
         if not r.any_tickets_open:
-            lines.append("⏳ _Bookings NOT open yet for this date._")
+            lines.append("⏳ _No bookable seats yet for this date._")
             continue
 
         if r.newly_opened_cinemas:
@@ -777,12 +777,12 @@ def render_multi_email_content(
         for r in ordered:
             d_lbl = _effective_date_label(r)
             date_code = f" ({r.job.target_date})" if r.job.target_date.upper() != "ANY" else ""
-            text_lines.append(f"  • {d_lbl}{date_code} : ⏳ Bookings NOT open yet")
+            text_lines.append(f"  • {d_lbl}{date_code} : ⏳ No bookable seats yet")
             html_date_rows.append(
                 f"""
                 <tr>
                   <td style="padding: 10px 12px; border-bottom: 1px solid #e2e8f0; font-weight: 600;">📅 {html.escape(d_lbl)} <span style="color:#64748b; font-weight:400;">{html.escape(date_code)}</span></td>
-                  <td style="padding: 10px 12px; border-bottom: 1px solid #e2e8f0; color: #b45309; font-weight: 600;">⏳ Bookings NOT open yet</td>
+                  <td style="padding: 10px 12px; border-bottom: 1px solid #e2e8f0; color: #b45309; font-weight: 600;">⏳ No bookable seats yet</td>
                 </tr>
                 """
             )
@@ -844,7 +844,14 @@ def render_multi_email_content(
     # Tickets are open on at least one date: build a consolidated multi-date email
     total_new = sum(len(r.newly_opened_cinemas) for r in ordered)
     max_update = max(r.update_number for r in ordered)
-    if total_new > 0:
+    if is_heartbeat:
+        seats_n = sum(r.bookable_show_count for r in ordered)
+        seats_str = f"{seats_n} show(s) with seats" if seats_n else "all shows sold out"
+        subject = (
+            f"💓 [4-Hour Heartbeat] No new openings for {first_job.movie} "
+            f"({combined_dates_str}) — {seats_str}"
+        )
+    elif total_new > 0:
         subject = (
             f"🎟️ [Update #{max_update}] Tickets Open for {first_job.movie} "
             f"({combined_dates_str}) — {total_new} New Cinema Opening(s)"
@@ -874,7 +881,7 @@ def render_multi_email_content(
             ]
         )
         if not r.any_tickets_open:
-            text_blocks.append(f"⏳ Bookings NOT open yet for {d_lbl}.")
+            text_blocks.append(f"⏳ No bookable seats yet for {d_lbl}.")
             html_date_sections.append(
                 f"""
                 <div style="margin-top: 20px; border: 1px solid #e2e8f0; border-radius: 8px; padding: 14px 18px; background: #f8fafc;">

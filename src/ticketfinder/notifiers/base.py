@@ -4,7 +4,7 @@ import subprocess
 from typing import Optional
 
 from ticketfinder.config import Settings
-from ticketfinder.models import DiffReport
+from ticketfinder.models import DiffReport, bookable_only_report
 from ticketfinder.notifiers.gmail import send_gmail_notification
 from ticketfinder.notifiers.telegram import send_telegram_notification
 from ticketfinder.notifiers.templates import (
@@ -27,13 +27,14 @@ def send_macos_desktop_banner(
     job = r_list[0].job
     dates_str = ", ".join(_effective_date_label(r) for r in r_list)
     any_open = any(r.any_tickets_open for r in r_list)
-    if any_open:
+    if is_heartbeat:
+        title = f"💓 Heartbeat: {job.movie}"
+        seats_n = sum(r.bookable_show_count for r in r_list)
+        subtitle = f"No new openings — {seats_n} show(s) with seats on {dates_str}"
+    elif any_open:
         title = f"🎟️ Tickets Open: {job.movie}"
         new_c = sum(len(r.newly_opened_cinemas) for r in r_list)
         subtitle = f"{new_c} new cinema(s) on {dates_str} in {job.city}"
-    elif is_heartbeat:
-        title = f"💓 Heartbeat: {job.movie}"
-        subtitle = f"Batch job active — checked {dates_str}"
     else:
         title = f"🤖 Watching: {job.movie}"
         subtitle = f"No tickets open yet for {dates_str}"
@@ -68,6 +69,8 @@ def dispatch_notifications(
     reports_list = [report] if isinstance(report, DiffReport) else list(report)
     if not reports_list:
         return {}
+    # Only ever show showtimes that can actually be booked.
+    reports_list = [bookable_only_report(r) for r in reports_list]
 
     cfg = settings or Settings.from_env()
     subject, email_text, _ = render_multi_email_content(

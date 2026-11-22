@@ -114,3 +114,56 @@ class TestDiffAndStorage(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+def test_sold_out_new_showtimes_are_not_new_openings():
+    from ticketfinder.diff import compute_diff_report
+    from ticketfinder.models import CinemaVenue, ShowtimeSlot, WatchJob
+
+    job = WatchJob(movie="M", target_date="2026-12-19", city="Chennai", id=1)
+    prev = CinemaVenue(
+        name="INOX X", platform="BMS", booking_url="u",
+        showtimes=[ShowtimeSlot(time="1:30 PM", date="2026-12-19", available_seats=0, total_seats=100)],
+    )
+    cur_sold = CinemaVenue(
+        name="INOX X", platform="BMS", booking_url="u",
+        showtimes=[
+            ShowtimeSlot(time="1:30 PM", date="2026-12-19", available_seats=0, total_seats=100),
+            ShowtimeSlot(time="10:05 AM", date="2026-12-19", available_seats=0, total_seats=100),
+        ],
+    )
+    new_sold_cinema = CinemaVenue(
+        name="PVR Y", platform="BMS", booking_url="u",
+        showtimes=[ShowtimeSlot(time="9:25 AM", date="2026-12-19", available_seats=0, total_seats=50)],
+    )
+    rep = compute_diff_report(job, [cur_sold, new_sold_cinema], {prev.normalized_key: prev})
+    assert rep.new_showtimes_cinemas and rep.newly_opened_cinemas
+    assert not rep.has_new_openings
+    assert rep.bookable_show_count == 0
+
+    cur_open = CinemaVenue(
+        name="INOX X", platform="BMS", booking_url="u",
+        showtimes=[ShowtimeSlot(time="10:05 AM", date="2026-12-19", available_seats=8, total_seats=100)],
+    )
+    rep2 = compute_diff_report(job, [cur_open], {prev.normalized_key: prev})
+    assert rep2.has_new_openings
+    assert rep2.bookable_show_count == 1
+
+
+def test_heartbeat_email_subject_is_not_a_ticket_update():
+    from ticketfinder.diff import compute_diff_report
+    from ticketfinder.models import CinemaVenue, ShowtimeSlot, WatchJob
+    from ticketfinder.notifiers.templates import render_multi_email_content
+
+    reports = []
+    for d in ("2026-12-19", "2026-12-20"):
+        job = WatchJob(movie="M", target_date=d, city="Chennai", id=1)
+        v = CinemaVenue(
+            name="INOX X", platform="BMS", booking_url="u",
+            showtimes=[ShowtimeSlot(time="1:30 PM", date=d, available_seats=0, total_seats=100)],
+        )
+        reports.append(compute_diff_report(job, [v], {v.normalized_key: v}))
+    subject, _, _ = render_multi_email_content(reports, is_heartbeat=True)
+    assert "Heartbeat" in subject and "Update #" not in subject
+    assert "all shows sold out" in subject
+

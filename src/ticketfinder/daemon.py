@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import fcntl
 import os
 import random
 import signal
@@ -21,6 +22,20 @@ from ticketfinder.storage import Storage
 
 def get_pid_file() -> Path:
     return get_app_dir() / "daemon.pid"
+
+
+def get_lock_file() -> Path:
+    return get_app_dir() / "daemon.lock"
+
+
+def _release_pid_file(pid: int) -> None:
+    """Removes the PID file only if it still points at this process (never another daemon's)."""
+    pid_file = get_pid_file()
+    try:
+        if pid_file.read_text(encoding="utf-8").strip() == str(pid):
+            pid_file.unlink(missing_ok=True)
+    except OSError:
+        pass
 
 
 def get_log_file() -> Path:
@@ -191,14 +206,28 @@ def run_daemon_worker_loop(
          - Sends immediate consolidated diff alerts if any watched date opens new cinemas/showtimes.
          - Sends a 4-hour Heartbeat Alert every heartbeat_minutes (default 240 mins) confirming the batch job is alive.
     """
+    pid = os.getpid()
+    # Single-instance guard: a second worker would send every alert/heartbeat twice.
+    lock_fh = open(get_lock_file(), "w", encoding="utf-8")
+    try:
+        fcntl.flock(lock_fh.fileno(), fcntl.LOCK_EX | fcntl.LOCK_NB)
+    except OSError:
+        print(
+            f"[{datetime.now().isoformat()}] Another TicketFinder daemon already holds the lock. "
+            f"Worker PID {pid} exiting to avoid duplicate notifications."
+        )
+        sys.stdout.flush()
+        return
+    lock_fh.write(str(pid))
+    lock_fh.flush()
+
     store = Storage()
     cfg = Settings.from_env()
-    pid = os.getpid()
     get_pid_file().write_text(str(pid), encoding="utf-8")
 
     def _handle_sigterm(signum: int, frame: object) -> None:
         print(f"[{datetime.now().isoformat()}] Daemon (PID {pid}) received stop signal. Exiting.")
-        get_pid_file().unlink(missing_ok=True)
+        _release_pid_file(pid)
         sys.exit(0)
 
     signal.signal(signal.SIGTERM, _handle_sigterm)
@@ -238,7 +267,7 @@ def run_daemon_worker_loop(
             print(
                 f"[{datetime.now().isoformat()}] No active watch jobs remaining. Daemon shutting down."
             )
-            get_pid_file().unlink(missing_ok=True)
+            _release_pid_file(pid)
             break
 
         # Group active jobs by movie + city + locality + cinemas so multiple dates send 1 consolidated notification

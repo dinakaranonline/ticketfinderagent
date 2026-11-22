@@ -286,3 +286,58 @@ class TestCheckersAndTemplates(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+def _district_payload(sessions):
+    return {
+        "props": {"pageProps": {"data": {"serverState": {"movieSessions": {"k": {
+            "searchDate": "2026-12-19",
+            "pageData": {"nearbyCinemas": [{
+                "cinemaInfo": {"name": "PVR Aerohub, Chennai", "latitude": 12.98, "longitude": 80.16},
+                "cinemaDisabled": False,
+                "sessions": sessions,
+            }]},
+        }}}}}}
+    }
+
+
+def _session(time_utc, avail, disable, color, areas):
+    return {
+        "showTime": time_utc, "closeTime": "2099-01-01T00:00", "avail": avail, "total": 197,
+        "scrnFmt": "3D", "statusColor": color, "seatStatus": "Almost Full",
+        "seatClass": "greyCol" if disable else "redCol", "disableClick": disable,
+        "areas": [{"label": l, "sAvail": a, "sTotal": t, "price": 100, "statusColor": c} for l, a, t, c in areas],
+    }
+
+
+def test_district_bookability_and_notification_filter(monkeypatch):
+    from ticketfinder.checkers.district import parse_district_next_data
+    from ticketfinder.diff import compute_diff_report
+    from ticketfinder.models import WatchJob, bookable_only_report
+
+    monkeypatch.setenv("MIN_BOOKABLE_SEATS", "4")
+    payload = _district_payload([
+        # greyed-out, click disabled (real 9:25 AM data)
+        _session("2026-12-19T03:55", 0, True, "D", [("CLASSIC", 0, 42, "D"), ("PRIME", 0, 155, "D")]),
+        # 2 leftover seats, clickable (real 4:35 PM data) -> below threshold
+        _session("2026-12-19T11:05", 2, False, "R", [("CLASSIC", 2, 42, "R"), ("PRIME", 0, 155, "D")]),
+        # closed category seats must not be counted
+        _session("2026-12-19T14:40", 30, False, "R", [("CLASSIC", 5, 42, "R"), ("PRIME", 25, 155, "D")]),
+        # disabled even though avail says 50
+        _session("2026-12-19T15:00", 50, True, "G", [("CLASSIC", 50, 42, "G")]),
+    ])
+    venues = parse_district_next_data(payload, "2026-12-19", "u")
+    slots = {s.time: s for s in venues[0].showtimes}
+    assert slots["9:25 AM"].is_bookable is False
+    assert slots["4:35 PM"].is_bookable is False
+    assert slots["8:10 PM"].available_seats == 5 and slots["8:10 PM"].is_bookable
+    assert slots["8:30 PM"].is_bookable is False
+
+    job = WatchJob(movie="M", target_date="2026-12-19", city="Chennai", id=1)
+    rep = bookable_only_report(compute_diff_report(job, venues, {}))
+    assert [s.time for s in rep.newly_opened_cinemas[0].showtimes] == ["8:10 PM"]
+
+    only_dead = parse_district_next_data(_district_payload(payload["props"]["pageProps"]["data"]["serverState"]["movieSessions"]["k"]["pageData"]["nearbyCinemas"][0]["sessions"][:2]), "2026-12-19", "u")
+    rep2 = compute_diff_report(job, only_dead, {})
+    assert not rep2.has_new_openings
+    assert not bookable_only_report(rep2).any_tickets_open
