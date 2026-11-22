@@ -57,7 +57,12 @@ def compute_diff_report(
             for slot in venue.showtimes:
                 t_key = _slot_key(slot)
                 alt_key = slot.time.strip().upper()
-                if t_key not in prev_slots_map and alt_key not in prev_slots_map:
+                prev_slot = prev_slots_map.get(t_key) or prev_slots_map.get(alt_key)
+                if prev_slot is None:
+                    added_slots.append(slot)
+                elif slot.is_bookable and not prev_slot.is_bookable:
+                    # Known show that just became bookable (greyed out / "Lapsed" / sold out
+                    # last time, open now): this is the moment booking opens, so alert on it.
                     added_slots.append(slot)
                 else:
                     continuing_slots.append(slot)

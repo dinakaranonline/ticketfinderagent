@@ -1,0 +1,310 @@
+{
+ "result": "success",
+ "output": {
+  "showCount": 0,
+  "days": [],
+  "movieCinemaSessions": [
+   {
+    "cinema": {
+     "theatreId": "232",
+     "name": "INOX The Marina Mall, OMR, Chennai",
+     "cityName": "Chennai",
+     "address1": "PVR INOX Limited., 3rd Floor, The Marina Mall, ",
+     "latitude": "12.83598504",
+     "longitude": "80.22942733",
+     "distance": 7075,
+     "distanceText": "7.1 km away",
+     "showCount": 0
+    },
+    "showCount": 4,
+    "experienceSessions": [
+     {
+      "experience": "BIGPIX",
+      "shows": [
+       {
+        "theatreId": "232",
+        "sessionId": 93293,
+        "screenId": 603,
+        "movieId": "39343",
+        "showDate": "2026-12-18",
+        "showTime": "01:30 PM",
+        "screenType": "BIGPIX",
+        "screenName": "SCREEN 1",
+        "filmFormat": "3D MS - INFINITY VISION",
+        "language": "English",
+        "movieFormat": "3D MS - Infinity Vision",
+        "statusCode": "b3b2b2",
+        "status": 0,
+        "statusTxt": "Lapsed",
+        "encrypted": "klCOt56RBBZZuv6ad6xOhw=="
+       },
+       {
+        "theatreId": "232",
+        "sessionId": 93294,
+        "screenId": 603,
+        "movieId": "39343",
+        "showDate": "2026-12-18",
+        "showTime": "04:55 PM",
+        "screenType": "BIGPIX",
+        "screenName": "SCREEN 1",
+        "filmFormat": "3D MS - INFINITY VISION",
+        "language": "English",
+        "movieFormat": "3D MS - Infinity Vision",
+        "statusCode": "b3b2b2",
+        "status": 0,
+        "statusTxt": "Lapsed",
+        "encrypted": "klCOt56RBBYcdBcKiitmdw=="
+       },
+       {
+        "theatreId": "232",
+        "sessionId": 93296,
+        "screenId": 603,
+        "movieId": "39343",
+        "showDate": "2026-12-18",
+        "showTime": "08:20 PM",
+        "screenType": "BIGPIX",
+        "screenName": "SCREEN 1",
+        "filmFormat": "3D MS - INFINITY VISION",
+        "language": "English",
+        "movieFormat": "3D MS - Infinity Vision",
+        "statusCode": "b3b2b2",
+        "status": 0,
+        "statusTxt": "Lapsed",
+        "encrypted": "klCOt56RBBZZ4D5i(Nk)PQ=="
+       },
+       {
+        "theatreId": "232",
+        "sessionId": 93297,
+        "screenId": 603,
+        "movieId": "39343",
+        "showDate": "2026-12-18",
+        "showTime": "11:45 PM",
+        "screenType": "BIGPIX",
+        "screenName": "SCREEN 1",
+        "filmFormat": "3D MS - INFINITY VISION",
+        "language": "English",
+        "movieFormat": "3D MS - Infinity Vision",
+        "statusCode": "b3b2b2",
+        "status": 0,
+        "statusTxt": "Lapsed",
+        "encrypted": "klCOt56RBBb(OQy55gKVYQ=="
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "cinema": {
+     "theatreId": "432",
+     "name": "PVR AEROHUB Chennai",
+     "cityName": "Chennai",
+     "address1": "PVR Cinemas,2nd Floor,Aerohub East Wing,MLCP Block,",
+     "latitude": "12.98206237",
+     "longitude": "80.16532032",
+     "distance": 11613,
+     "distanceText": "11.6 km away",
+     "showCount": 0
+    },
+    "showCount": 4,
+    "experienceSessions": [
+     {
+      "experience": "",
+      "shows": [
+       {
+        "theatreId": "432",
+        "sessionId": 23418,
+        "screenId": 1429,
+        "movieId": "39343",
+        "showDate": "2026-12-18",
+        "showTime": "01:00 PM",
+        "screenType": "",
+        "screenName": "AUDI 03",
+        "filmFormat": "3D MS - INFINITY VISION",
+        "language": "English",
+        "movieFormat": "3D MS - Infinity Vision",
+        "statusCode": "ed4141",
+        "status": 3,
+        "statusTxt": "Housefull show! Please try another one.",
+        "encrypted": "3H6()hmSGCHBxrzpE2JH5g=="
+       },
+       {
+        "theatreId": "432",
+        "sessionId": 23419,
+        "screenId": 1429,
+        "movieId": "39343",
+        "showDate": "2026-12-18",
+        "showTime": "04:35 PM",
+        "screenType": "",
+        "screenName": "AUDI 03",
+        "filmFormat": "3D MS - INFINITY VISION",
+        "language": "English",
+        "movieFormat": "3D MS - Infinity Vision",
+        "statusCode": "b3b2b2",
+        "status": 0,
+        "statusTxt": "Lapsed",
+        "encrypted": "3H6()hmSGCGuB)EXAmkBOg=="
+       },
+       {
+        "theatreId": "432",
+        "sessionId": 23420,
+        "screenId": 1429,
+        "movieId": "39343",
+        "showDate": "2026-12-18",
+        "showTime": "08:10 PM",
+        "screenType": "",
+        "screenName": "AUDI 03",
+        "filmFormat": "3D MS - INFINITY VISION",
+        "language": "English",
+        "movieFormat": "3D MS - Infinity Vision",
+        "statusCode": "ed4141",
+        "status": 3,
+        "statusTxt": "Housefull show! Please try another one.",
+        "encrypted": "B92Qq5N)(LPDiwiihUIRTw=="
+       },
+       {
+        "theatreId": "432",
+        "sessionId": 23421,
+        "screenId": 1429,
+        "movieId": "39343",
+        "showDate": "2026-12-18",
+        "showTime": "11:45 PM",
+        "screenType": "",
+        "screenName": "AUDI 03",
+        "filmFormat": "3D MS - INFINITY VISION",
+        "language": "English",
+        "movieFormat": "3D MS - Infinity Vision",
+        "statusCode": "b3b2b2",
+        "status": 0,
+        "statusTxt": "Lapsed",
+        "encrypted": "B92Qq5N)(LOBqqegUor1rg=="
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "cinema": {
+     "theatreId": "358",
+     "name": "PVR, Ampa Mall, Nelson Manickam Road Chennai",
+     "cityName": "Chennai",
+     "address1": "PVR INOX Limited., 4th Floor,Ampa Skywalk Mall,",
+     "latitude": "13.07404762",
+     "longitude": "80.22141464",
+     "distance": 19425,
+     "distanceText": "19.4 km away",
+     "showCount": 0
+    },
+    "showCount": 6,
+    "experienceSessions": [
+     {
+      "experience": "",
+      "shows": [
+       {
+        "theatreId": "358",
+        "sessionId": 34528,
+        "screenId": 1079,
+        "movieId": "39381",
+        "showDate": "2026-12-18",
+        "showTime": "06:30 AM",
+        "screenType": "",
+        "screenName": "AUDI 03",
+        "filmFormat": "3D MS - INFINITY VISION",
+        "language": "Tamil",
+        "movieFormat": "3D MS - Infinity Vision",
+        "statusCode": "D5A664",
+        "status": 2,
+        "statusTxt": "Filling Up Fast",
+        "encrypted": "eJL02f0QOW28A9MGoxvjxg=="
+       },
+       {
+        "theatreId": "358",
+        "sessionId": 34529,
+        "screenId": 1079,
+        "movieId": "39381",
+        "showDate": "2026-12-18",
+        "showTime": "09:55 AM",
+        "screenType": "",
+        "screenName": "AUDI 03",
+        "filmFormat": "3D MS - INFINITY VISION",
+        "language": "Tamil",
+        "movieFormat": "3D MS - Infinity Vision",
+        "statusCode": "D5A664",
+        "status": 2,
+        "statusTxt": "Filling Up Fast",
+        "encrypted": "eJL02f0QOW2yV28fAgGZbQ=="
+       },
+       {
+        "theatreId": "358",
+        "sessionId": 34530,
+        "screenId": 1079,
+        "movieId": "39381",
+        "showDate": "2026-12-18",
+        "showTime": "01:20 PM",
+        "screenType": "",
+        "screenName": "AUDI 03",
+        "filmFormat": "3D MS - INFINITY VISION",
+        "language": "Tamil",
+        "movieFormat": "3D MS - Infinity Vision",
+        "statusCode": "D5A664",
+        "status": 2,
+        "statusTxt": "Filling Up Fast",
+        "encrypted": "TSs4A4(1H96iyPrWdp(T5g=="
+       },
+       {
+        "theatreId": "358",
+        "sessionId": 34531,
+        "screenId": 1079,
+        "movieId": "39381",
+        "showDate": "2026-12-18",
+        "showTime": "04:45 PM",
+        "screenType": "",
+        "screenName": "AUDI 03",
+        "filmFormat": "3D MS - INFINITY VISION",
+        "language": "Tamil",
+        "movieFormat": "3D MS - Infinity Vision",
+        "statusCode": "D5A664",
+        "status": 2,
+        "statusTxt": "Filling Up Fast",
+        "encrypted": "TSs4A4(1H95aVCHoRYm0jA=="
+       },
+       {
+        "theatreId": "358",
+        "sessionId": 34532,
+        "screenId": 1079,
+        "movieId": "39381",
+        "showDate": "2026-12-18",
+        "showTime": "08:10 PM",
+        "screenType": "",
+        "screenName": "AUDI 03",
+        "filmFormat": "3D MS - INFINITY VISION",
+        "language": "Tamil",
+        "movieFormat": "3D MS - Infinity Vision",
+        "statusCode": "D5A664",
+        "status": 2,
+        "statusTxt": "Filling Up Fast",
+        "encrypted": "TSs4A4(1H95HLuE8rk(PBA=="
+       },
+       {
+        "theatreId": "358",
+        "sessionId": 34533,
+        "screenId": 1079,
+        "movieId": "39381",
+        "showDate": "2026-12-18",
+        "showTime": "11:35 PM",
+        "screenType": "",
+        "screenName": "AUDI 03",
+        "filmFormat": "3D MS - INFINITY VISION",
+        "language": "Tamil",
+        "movieFormat": "3D MS - Infinity Vision",
+        "statusCode": "D5A664",
+        "status": 2,
+        "statusTxt": "Filling Up Fast",
+        "encrypted": "TSs4A4(1H94R8c2sz4hS3w=="
+       }
+      ]
+     }
+    ]
+   }
+  ]
+ }
+}

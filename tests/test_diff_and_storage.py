@@ -167,3 +167,46 @@ def test_heartbeat_email_subject_is_not_a_ticket_update():
     assert "Heartbeat" in subject and "Update #" not in subject
     assert "all shows sold out" in subject
 
+
+def test_known_show_that_becomes_bookable_is_a_new_opening():
+    from ticketfinder.diff import compute_diff_report
+    from ticketfinder.models import CinemaVenue, ShowtimeSlot, WatchJob
+
+    job = WatchJob(movie="M", target_date="2026-12-18", city="Chennai", id=1)
+
+    def venue(**slot_kwargs):
+        return CinemaVenue(
+            name="INOX The Marina Mall", platform="PVR INOX", booking_url="u",
+            showtimes=[ShowtimeSlot(time="1:30 PM", date="2026-12-18", **slot_kwargs)],
+        )
+
+    greyed = venue(bookable=False)  # PVR "Lapsed": listed but not on sale
+    opened = venue(available_seats=120, total_seats=300, bookable=True)
+
+    rep = compute_diff_report(job, [opened], {greyed.normalized_key: greyed})
+    assert rep.has_new_openings
+    assert [s.time for s in rep.new_showtimes_cinemas[0].added_showtimes] == ["1:30 PM"]
+
+    # Sold out last time, seats released now: also worth an alert.
+    sold = venue(available_seats=0, total_seats=300)
+    assert compute_diff_report(job, [opened], {sold.normalized_key: sold}).has_new_openings
+
+    # Already bookable last time: just a seat-count update, not a new opening.
+    rep3 = compute_diff_report(job, [opened], {opened.normalized_key: venue(available_seats=150, total_seats=300)})
+    assert not rep3.new_showtimes_cinemas
+    assert not rep3.has_new_openings
+
+    # Still greyed out: nothing new.
+    assert not compute_diff_report(job, [greyed], {greyed.normalized_key: greyed}).new_showtimes_cinemas
+
+
+def test_seat_delta_across_different_hall_sizes_shows_only_seats_left():
+    from ticketfinder.models import ShowtimeSlot
+
+    prev = ShowtimeSlot(time="8:10 PM", available_seats=6, total_seats=197)   # District
+    cur = ShowtimeSlot(time="8:10 PM", available_seats=6, total_seats=221)    # PVR seat map
+    assert "was" not in cur.format_seat_summary(prev_slot=prev)  # no fake "24 more booked"
+    cur2 = ShowtimeSlot(time="8:10 PM", available_seats=5, total_seats=221)
+    assert "(was 6 avail)" in cur2.format_seat_summary(prev_slot=prev)
+    same = ShowtimeSlot(time="8:10 PM", available_seats=4, total_seats=197)
+    assert "(was 6 avail / 191 booked)" in same.format_seat_summary(prev_slot=prev)

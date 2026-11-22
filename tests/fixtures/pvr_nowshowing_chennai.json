@@ -1,0 +1,95 @@
+{
+ "result": "success",
+ "output": {
+  "mv": [
+   {
+    "id": "37918",
+    "n": "O.M OPERATION MOLE",
+    "filmName": "O.M OPERATION MOLE (TAMIL WITH ENGLISH SUBTITLE)",
+    "films": [
+     {
+      "filmId": "39336",
+      "filmType": "F",
+      "filmName": "O.M OPERATION MOLE (TAMIL WITH ENGLISH SUBTITLE)",
+      "format": "",
+      "releaseDate": "Nov 20, 2026",
+      "language": "Tamil",
+      "filmCommonCode": "37918",
+      "filmCommonName": "O.M OPERATION MOLE",
+      "filmNameWeb": "O.M OPERATION MOLE",
+      "stopTimeInMin": 0,
+      "xlCinema": false,
+      "subtitle": "English",
+      "vakaao": false,
+      "nowshowing": false,
+      "mtrailerurl": "https://www.youtube.com/watch?v=zr9QY9am5XE"
+     }
+    ],
+    "movieType": "NOWSHOWING",
+    "releaseDate": "Nov 20, 2026",
+    "otherlanguages": "Tamil"
+   },
+   {
+    "id": "35312",
+    "n": "AVENGERS: DOOMSDAY",
+    "filmName": "AVENGERS: DOOMSDAY (3D MS - INFINITY VISION  ENGLISH WITH ENGLISH SUBTITLE)",
+    "films": [
+     {
+      "filmId": "39343",
+      "filmType": "F",
+      "filmName": "AVENGERS: DOOMSDAY (3D MS - INFINITY VISION  ENGLISH WITH ENGLISH SUBTITLE)",
+      "format": "3D MS - Infinity Vision",
+      "releaseDate": "Dec 17, 2026",
+      "language": "English",
+      "filmCommonCode": "35312",
+      "filmCommonName": "AVENGERS: DOOMSDAY",
+      "filmNameWeb": "AVENGERS: DOOMSDAY",
+      "stopTimeInMin": 0,
+      "xlCinema": false,
+      "subtitle": "English",
+      "vakaao": false,
+      "nowshowing": false,
+      "mtrailerurl": "https://www.youtube.com/watch?v=NEB6j0-ZYDQ"
+     },
+     {
+      "filmId": "39381",
+      "filmType": "F",
+      "filmName": "AVENGERS: DOOMSDAY (3D TAMIL MS - INFINITY VISION)",
+      "format": "3D MS - Infinity Vision",
+      "releaseDate": "Dec 17, 2026",
+      "language": "Tamil",
+      "filmCommonCode": "35312",
+      "filmCommonName": "AVENGERS: DOOMSDAY",
+      "filmNameWeb": "AVENGERS: DOOMSDAY",
+      "stopTimeInMin": 0,
+      "xlCinema": false,
+      "subtitle": "",
+      "vakaao": false,
+      "nowshowing": false,
+      "mtrailerurl": "https://www.youtube.com/watch?v=bWDGKRdiVZc"
+     },
+     {
+      "filmId": "39406",
+      "filmType": "F",
+      "filmName": "AVENGERS: DOOMSDAY (3D MS - INFINITY VISION ENGLISH ATMOS WITH ENGLISH SUBTITLE)",
+      "format": "3D MS - Infinity Vision ATMOS",
+      "releaseDate": "Dec 17, 2026",
+      "language": "English",
+      "filmCommonCode": "35312",
+      "filmCommonName": "AVENGERS: DOOMSDAY",
+      "filmNameWeb": "AVENGERS: DOOMSDAY",
+      "stopTimeInMin": 0,
+      "xlCinema": false,
+      "subtitle": "English",
+      "vakaao": false,
+      "nowshowing": false,
+      "mtrailerurl": "https://www.youtube.com/watch?v=NEB6j0-ZYDQ"
+     }
+    ],
+    "movieType": "NOWSHOWING",
+    "releaseDate": "Dec 17, 2026",
+    "otherlanguages": "English, Tamil"
+   }
+  ]
+ }
+}

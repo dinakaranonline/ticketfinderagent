@@ -303,7 +303,7 @@ def render_email_content(
             <p style="margin: 6px 0 0; color: #cbd5e1; font-size: 14px;">📅 {html.escape(date_label)} &nbsp;|&nbsp; 📍 {html.escape(job.target_summary)}</p>
           </div>
           <div style="padding: 20px 24px; color: #1f2937; line-height: 1.6;">
-            <p><strong>⏳ Current Status:</strong> Bookings are <strong>not open yet</strong> for {html.escape(date_label)}.</p>
+            <p><strong>⏳ Current Status:</strong> <strong>no bookable seats</strong> near you for {html.escape(date_label)} (shows are sold out or closed).</p>
             <p><strong>🌐 Platforms Checked:</strong> {html.escape(', '.join(report.sites_checked))}</p>
             <div style="margin: 14px 0;">
               <a href="{html.escape(bms_city_url)}" style="display:inline-block; background:#dc2626; color:#ffffff; text-decoration:none; padding:7px 12px; border-radius:6px; font-weight:600; font-size:12px; margin-right:8px;">BookMyShow ({html.escape(job.city)})</a>
@@ -886,7 +886,7 @@ def render_multi_email_content(
                 f"""
                 <div style="margin-top: 20px; border: 1px solid #e2e8f0; border-radius: 8px; padding: 14px 18px; background: #f8fafc;">
                   <h3 style="margin: 0 0 6px; color: #1e293b; font-size: 16px;">📅 {html.escape(d_lbl)}{html.escape(date_code)}</h3>
-                  <p style="margin: 0; color: #b45309; font-weight: 600; font-size: 13px;">⏳ Bookings are not open yet for this date.</p>
+                  <p style="margin: 0; color: #b45309; font-weight: 600; font-size: 13px;">⏳ No bookable seats near you for this date (shows are sold out or closed).</p>
                 </div>
                 """
             )

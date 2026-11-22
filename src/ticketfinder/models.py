@@ -117,7 +117,17 @@ class ShowtimeSlot:
 
         if prev_slot is not None:
             if prev_slot.available_seats is not None and prev_slot.booked_seats is not None:
-                if (
+                same_hall = (
+                    prev_slot.total_seats is None
+                    or self.total_seats is None
+                    or prev_slot.total_seats == self.total_seats
+                )
+                if not same_hall:
+                    # Different source last time (e.g. District counts 197 sellable seats, PVR's
+                    # seat map 221 incl. held ones): "booked" isn't comparable, seats left are.
+                    if prev_slot.available_seats != self.available_seats:
+                        parts.append(f"(was {prev_slot.available_seats} avail)")
+                elif (
                     prev_slot.available_seats != self.available_seats
                     or prev_slot.booked_seats != self.booked_seats
                 ):

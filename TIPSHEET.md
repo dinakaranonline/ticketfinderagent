@@ -15,7 +15,7 @@ Run all commands from `/Users/dinakaran/code/ticketfinderagent` (or print this c
 | **Start background watcher (5m + 30m + 1h HB)** | `./ticketfinder watch <query> --daemon --yes` |
 | **Check active jobs & daemon PID** | `./ticketfinder status` |
 | **Force immediate check on active jobs** | `./ticketfinder check` |
-| **Preview 1-hour heartbeat message** | `./ticketfinder check --heartbeat --cli-only` |
+| **Preview 4-hour heartbeat message** | `./ticketfinder check --heartbeat --cli-only` |
 | **Stop watching a specific movie** | `./ticketfinder stop --movie "Ramayana"` |
 | **Stop a specific Job ID** | `./ticketfinder stop --id 39` |
 | **Stop ALL jobs & background daemon** | `./ticketfinder stop` |
@@ -50,7 +50,7 @@ Waits **1 minute (`60s`)** so you can lock your Mac (`Control + Command + Q`), t
 Runs in the background wrapped with macOS `/usr/bin/caffeinate -i -s` so it keeps working even when your Mac screen is locked:
 - **First alert**: Sent **5 minutes** after setup.
 - **Diff checks**: Runs every **30 minutes** (alerts immediately when new cinemas or showtimes open).
-- **Heartbeat alert**: Sends a **1-Hour Heartbeat** every **60 minutes** confirming the batch job is alive.
+- **Heartbeat alert**: Sends a **4-Hour Heartbeat** every **4 hours** confirming the batch job is alive.
 
 ### A. Watch Multiple Dates for the Same Movie (1 Consolidated Alert)
 ```bash

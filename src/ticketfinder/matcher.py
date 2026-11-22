@@ -33,9 +33,65 @@ def is_cinema_name_match(venue_name: str, requested_cinemas: list[str]) -> bool:
     return False
 
 
+_GENERIC_VENUE_WORDS = {
+    "pvr", "inox", "cinepolis", "cinemas", "cinema", "multiplex", "theatre", "theatres",
+    "mall", "the", "and", "of", "luxe", "formerly", "chennai", "road", "rd", "audi",
+    "screen", "all", "new", "3d", "2d", "4k", "laser", "dolby", "atmos", "imax",
+}
+
+
+def _distinctive_tokens(name: str) -> set[str]:
+    import unicodedata
+
+    ascii_name = unicodedata.normalize("NFKD", name).encode("ascii", "ignore").decode()
+    return {
+        w for w in _normalize_tokens(ascii_name).split()
+        if w not in _GENERIC_VENUE_WORDS and not w.isdigit() and len(w) > 1
+    }
+
+
+def is_same_cinema_cross_platform(a: CinemaVenue, b: CinemaVenue) -> bool:
+    """
+    Platforms name the same cinema differently ("INOX The Marina Mall, OMR, Chennai" on
+    PVR vs "INOX The Marina Mall, OMR, Egatoor, Chennai" on District). Treat two venues as
+    one cinema when they share a distinctive name word and either sit within 0.5 km of
+    each other or one name's distinctive words are a subset of the other's (and their
+    coordinates, if both known, don't put them more than 1 km apart).
+    """
+    ta, tb = _distinctive_tokens(a.name), _distinctive_tokens(b.name)
+    if not ta or not tb or not (ta & tb):
+        return False
+    dist: Optional[float] = None
+    if None not in (a.latitude, a.longitude, b.latitude, b.longitude):
+        dist = haversine_km(a.latitude, a.longitude, b.latitude, b.longitude)
+        if dist <= 0.5:
+            return True
+        if dist > 1.0:
+            return False
+    return ta <= tb or tb <= ta
+
+
+# Checkers that read a cinema chain's own booking system (see checkers/pvrinox.py, cinepolis.py).
+CHAIN_PLATFORMS = {"pvr inox", "cinepolis"}
+
+
+def _take_chain_slot(curr: ShowtimeSlot, chain: ShowtimeSlot) -> None:
+    """Overwrites an aggregator slot's availability with the chain site's answer."""
+    curr.bookable = chain.bookable
+    curr.status = chain.status
+    if chain.available_seats is not None or not chain.is_bookable:
+        curr.available_seats = chain.available_seats
+        curr.booked_seats = chain.booked_seats
+        curr.total_seats = chain.total_seats
+    if chain.category_info:
+        curr.category_info = chain.category_info
+
+
 def merge_venues_across_platforms(venues: list[CinemaVenue]) -> list[CinemaVenue]:
     """Merges the same cinema discovered across multiple platforms into a unified CinemaVenue."""
     by_key: dict[str, CinemaVenue] = {}
+    aliases: dict[str, str] = {}  # venue name key -> key of the merged venue it joined
+    chain_slots: set[int] = set()  # ids of slots whose availability came from a chain's own site
 
     def _slot_key(s: ShowtimeSlot) -> str:
         return f"{s.date or ''}_{s.time.strip().upper()}"
@@ -44,7 +100,18 @@ def merge_venues_across_platforms(venues: list[CinemaVenue]) -> list[CinemaVenue
         key = v.normalized_key
         if not key:
             continue
+        key = aliases.get(key, key)
         if key not in by_key:
+            # Same cinema under a different name on another platform?
+            for existing_key, existing in by_key.items():
+                platforms = {existing.platform.lower()} | {p.lower() for p, _ in existing.extra_platforms}
+                if v.platform.lower() not in platforms and is_same_cinema_cross_platform(existing, v):
+                    aliases[key] = existing_key
+                    key = existing_key
+                    break
+        if key not in by_key:
+            if v.platform.lower() in CHAIN_PLATFORMS:
+                chain_slots.update(id(s) for s in v.showtimes)
             by_key[key] = CinemaVenue(
                 name=v.name,
                 platform=v.platform,
@@ -78,11 +145,29 @@ def merge_venues_across_platforms(venues: list[CinemaVenue]) -> list[CinemaVenue
                 if s_key not in slots_by_key:
                     slots_by_key[s_key] = s
                     existing.showtimes.append(s)
+                    if v.platform.lower() in CHAIN_PLATFORMS:
+                        chain_slots.add(id(s))
                 else:
                     curr = slots_by_key[s_key]
                     if not curr.date and s.date:
                         curr.date = s.date
-                    if curr.available_seats is None and s.available_seats is not None:
+                    if v.platform.lower() in CHAIN_PLATFORMS and id(curr) not in chain_slots:
+                        # The cinema chain's own site is the source of the inventory the
+                        # aggregators resell, so its answer wins in both directions: open there
+                        # but greyed on District, or dead/housefull there but "Available" on District.
+                        _take_chain_slot(curr, s)
+                        chain_slots.add(id(curr))
+                    elif id(curr) in chain_slots:
+                        pass  # already settled by the chain's own data
+                    elif s.is_bookable and not curr.is_bookable:
+                        # Another aggregator can sell this show while the primary one can't.
+                        curr.available_seats = s.available_seats
+                        curr.booked_seats = s.booked_seats
+                        curr.total_seats = s.total_seats
+                        curr.status = s.status
+                        curr.bookable = s.bookable
+                        curr.category_info = s.category_info or curr.category_info
+                    elif curr.available_seats is None and s.available_seats is not None:
                         curr.available_seats = s.available_seats
                         curr.booked_seats = s.booked_seats
                         curr.total_seats = s.total_seats

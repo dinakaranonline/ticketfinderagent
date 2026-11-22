@@ -130,7 +130,9 @@ def check_all_platforms(
     """
     if checkers is None:
         from ticketfinder.checkers.bookmyshow import BookMyShowChecker
+        from ticketfinder.checkers.cinepolis import CinepolisChecker
         from ticketfinder.checkers.district import DistrictChecker
+        from ticketfinder.checkers.pvrinox import PVRInoxChecker
         from ticketfinder.checkers.ticketnew import TicketNewChecker
         from ticketfinder.checkers.web_discovery import WebDiscoveryChecker
 
@@ -139,19 +141,23 @@ def check_all_platforms(
             DistrictChecker(),
             TicketNewChecker(),
             WebDiscoveryChecker(),
+            # Direct cinema-chain sites: bookings can open here before the aggregators.
+            PVRInoxChecker(),
+            CinepolisChecker(),
         ]
 
-    all_venues: list[CinemaVenue] = []
     sites_checked: list[str] = [c.platform_name for c in checkers]
+    results: list[list[CinemaVenue]] = [[] for _ in checkers]
 
     with ThreadPoolExecutor(max_workers=len(checkers)) as pool:
-        future_map = {pool.submit(c.check, job): c.platform_name for c in checkers}
+        future_map = {pool.submit(c.check, job): i for i, c in enumerate(checkers)}
         for fut in as_completed(future_map):
             try:
-                venues = fut.result()
-                if venues:
-                    all_venues.extend(venues)
+                results[future_map[fut]] = fut.result() or []
             except Exception:
                 continue
 
+    # Keep checker order (not completion order) so the cross-platform merge picks the
+    # same primary name/platform for a cinema on every run.
+    all_venues = [v for venues in results for v in venues]
     return all_venues, sites_checked
